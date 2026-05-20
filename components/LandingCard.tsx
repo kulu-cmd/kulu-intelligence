@@ -31,6 +31,7 @@ type Tile = {
   meta: string;
   href: string;
   surface: Surface;
+  image: string;
 };
 
 const tiles: Tile[] = [
@@ -41,6 +42,7 @@ const tiles: Tile[] = [
     meta: "60 — 120 min",
     href: "/learn",
     surface: "dawn",
+    image: "/seminars.png",
   },
   {
     label: "Implement",
@@ -49,6 +51,7 @@ const tiles: Tile[] = [
     meta: "From R8,500",
     href: "/implement",
     surface: "indigo",
+    image: "/workflows.png",
   },
   {
     label: "Practice",
@@ -57,6 +60,7 @@ const tiles: Tile[] = [
     meta: "37 engagements",
     href: "/case-studies",
     surface: "coral",
+    image: "/testimonials.png",
   },
   {
     label: "Approach",
@@ -65,6 +69,7 @@ const tiles: Tile[] = [
     meta: "Johannesburg · 2026",
     href: "/about",
     surface: "mielie",
+    image: "/why-kulu.png",
   },
 ];
 
@@ -88,6 +93,7 @@ const accentLineColour: Record<Surface, string> = {
   coral: "bg-dawn",
   mielie: "bg-stoep",
 };
+
 
 const letters = ["K", "u", "l", "u"];
 
@@ -325,29 +331,16 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
         data-cursor
         data-cursor-label="Open →"
         className={[
-          "tile group relative block h-full w-full overflow-hidden text-center",
-          "px-5 py-6 sm:p-7 md:p-8",
+          "tile group relative flex flex-col h-full w-full overflow-hidden",
           "transition-colors duration-500",
           surfaceClasses[tile.surface],
         ].join(" ")}
       >
-        {/* Inner glow on hover */}
-        <motion.div
-          aria-hidden
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{
-            background:
-              tile.surface === "indigo"
-                ? "radial-gradient(circle at 50% 50%, rgba(255,107,92,0.12), transparent 60%)"
-                : "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), transparent 60%)",
-          }}
-        />
-
         {/* Accent line — grows in from centre on hover */}
         <span
           aria-hidden
           className={[
-            "absolute left-1/2 -translate-x-1/2 top-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 ease-kulu",
+            "absolute left-1/2 -translate-x-1/2 top-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 ease-kulu z-10",
             accentLineColour[tile.surface],
           ].join(" ")}
         />
@@ -357,49 +350,60 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           <span
             aria-hidden
             className={[
-              "hidden lg:block absolute left-0 top-6 bottom-6 w-px",
+              "hidden lg:block absolute left-0 top-6 bottom-6 w-px z-10",
               tile.surface === "indigo" ? "bg-dawn/15" : "bg-indigo/10",
             ].join(" ")}
           />
         )}
 
-        {/* Top row — label + open arrow */}
-        <div className="relative flex items-center justify-between text-left">
-          <span className="eyebrow opacity-65 text-[10px] sm:text-[11px]">
-            {tile.label}
-          </span>
-          <span className="eyebrow opacity-65 text-[10px] sm:text-[11px] inline-flex items-center gap-1">
-            <span>Open</span>
-            <motion.span
-              className="inline-block"
-              initial={false}
-              animate={{ x: 0 }}
-              whileHover={{ x: 4 }}
-            >
-              →
-            </motion.span>
-          </span>
+        {/* ── Image — top portion, raw, no filters ── */}
+        <div className="relative flex-none overflow-hidden" style={{ height: "60%" }}>
+          {/* Label + arrow overlaid on image */}
+          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 pt-5 sm:px-7 sm:pt-6 md:px-8 md:pt-7">
+            <span className="eyebrow opacity-65 text-[10px] sm:text-[11px]">
+              {tile.label}
+            </span>
+            <span className="eyebrow opacity-65 text-[10px] sm:text-[11px] inline-flex items-center gap-1">
+              <span>Open</span>
+              <motion.span
+                className="inline-block"
+                initial={false}
+                animate={{ x: 0 }}
+                whileHover={{ x: 4 }}
+              >
+                →
+              </motion.span>
+            </span>
+          </div>
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={tile.image}
+            alt=""
+            aria-hidden
+            className="w-full h-full object-cover object-top transition-transform duration-700 ease-kulu group-hover:scale-[1.04]"
+          />
         </div>
 
-        {/* Centred content */}
+        {/* ── Text area — below image ── */}
         <motion.div
-          style={{ x: tx, y: ty, rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-          className="relative h-full flex flex-col items-center justify-center gap-3 sm:gap-4 pt-8 pb-10 sm:pt-10 sm:pb-12"
+          style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
+          className="flex flex-col items-center justify-center text-center gap-2 sm:gap-3 px-5 py-5 sm:px-7 sm:py-6 md:px-8 md:py-7 flex-1"
         >
-          <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(30px,3.5vw,46px)]">
+          <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
             {tile.title}
             <span className={`period ${periodColour[tile.surface]}`}>.</span>
           </h3>
-          <p className="hidden md:block text-[13px] lg:text-[14px] leading-[1.5] max-w-[28ch] opacity-80">
+          <p className="text-[12px] md:text-[13px] lg:text-[14px] leading-[1.5] max-w-[26ch] opacity-80">
             {tile.body}
           </p>
         </motion.div>
 
-        {/* Bottom — meta */}
+        {/* ── Bottom meta ── */}
         <div
           className={[
-            "absolute bottom-5 sm:bottom-6 left-5 right-5 sm:left-7 sm:right-7 md:left-8 md:right-8",
-            "pt-3 border-t flex items-center justify-between gap-3",
+            "px-5 sm:px-7 md:px-8 pb-5 sm:pb-6 pt-3 mx-5 sm:mx-7 md:mx-8",
+            "border-t flex items-center justify-between gap-3",
             "text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium",
             tile.surface === "indigo" ? "border-dawn/15 opacity-65" : "border-current/15 opacity-65",
           ].join(" ")}
