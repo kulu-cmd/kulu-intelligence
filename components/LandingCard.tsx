@@ -406,23 +406,6 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
             className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-kulu group-hover:scale-[1.04]"
           />
 
-          {/* Label + arrow — top of image */}
-          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 pt-5 sm:px-7 sm:pt-6 md:px-8 md:pt-7">
-            <span className="eyebrow opacity-65 text-[10px] sm:text-[11px]">
-              {tile.label}
-            </span>
-            <span className="eyebrow opacity-65 text-[10px] sm:text-[11px] inline-flex items-center gap-1">
-              <span>Open</span>
-              <motion.span
-                className="inline-block"
-                initial={false}
-                animate={{ x: 0 }}
-                whileHover={{ x: 4 }}
-              >
-                →
-              </motion.span>
-            </span>
-          </div>
 
           {/* Title + body — transparent overlay at bottom of image */}
           <motion.div
