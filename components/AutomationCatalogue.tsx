@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 type Category =
   | "All"
@@ -212,8 +212,23 @@ const CATEGORIES: Category[] = [
   "HR & hiring",
 ];
 
+const ITEMS_PER_PAGE = 4;
+
+const pageVariants = {
+  enter: { opacity: 0, y: 18 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+};
+
+function globalNum(item: AutomationItem): string {
+  return String(ALL_ITEMS.findIndex((i) => i.id === item.id) + 1).padStart(2, "0");
+}
+
+/* ─── Main component ──────────────────────────────────────────────── */
+
 export function AutomationCatalogue() {
   const [active, setActive] = useState<Category>("All");
+  const [page, setPage] = useState(0);
 
   const filtered = useMemo(
     () =>
@@ -223,27 +238,43 @@ export function AutomationCatalogue() {
     [active]
   );
 
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const pageItems = filtered.slice(
+    page * ITEMS_PER_PAGE,
+    (page + 1) * ITEMS_PER_PAGE
+  );
+  const [featured, ...rest] = pageItems;
+
+  function navigate(newPage: number) {
+    setPage(newPage);
+  }
+
+  function changeCategory(cat: Category) {
+    setActive(cat);
+    setPage(0);
+  }
+
   return (
-    <section id="catalogue" className="py-24 md:py-32 bg-dawn">
+    <section id="catalogue" className="py-24 md:py-32 bg-dawn overflow-hidden">
       <div className="mx-auto max-w-[1480px] px-6 md:px-12">
 
         {/* Section header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10 md:mb-14">
-          <h2 className="font-display font-semibold text-[36px] md:text-[56px] lg:text-[64px] leading-[0.95] tracking-[-0.03em] max-w-[22ch]">
+          <h2 className="font-display font-semibold text-[36px] md:text-[56px] lg:text-[64px] leading-[0.95] tracking-[-0.03em]">
             What we can build for you
             <span className="text-stoep">.</span>
           </h2>
-          <div className="eyebrow opacity-55">04 — Automation catalogue</div>
+          <div className="eyebrow opacity-55">Automation catalogue</div>
         </div>
 
-        {/* Category filter — sliding coral underline */}
-        <div className="relative flex items-center overflow-x-auto no-scrollbar border-b border-indigo/10 mb-3">
+        {/* Category filter */}
+        <div className="relative flex items-center overflow-x-auto no-scrollbar border-b border-indigo/10 mb-10">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActive(cat)}
+              onClick={() => changeCategory(cat)}
               className={[
-                "relative flex-shrink-0 px-4 md:px-5 py-3 eyebrow transition-colors duration-250 whitespace-nowrap",
+                "relative flex-shrink-0 px-4 md:px-5 py-3 eyebrow transition-colors duration-200 whitespace-nowrap",
                 active === cat
                   ? "text-indigo"
                   : "text-indigo/35 hover:text-indigo/65",
@@ -262,128 +293,258 @@ export function AutomationCatalogue() {
           ))}
         </div>
 
-        {/* Count meta */}
-        <p className="eyebrow opacity-38 mb-10 md:mb-12 pt-3 text-[10px]">
-          {filtered.length} automation{filtered.length !== 1 ? "s" : ""}
-          {active !== "All" ? ` · ${active}` : " across all categories"}
-          {" · "}
-          Talk to us about any of these →
-        </p>
+        {/* Catalogue viewport */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${active}-${page}`}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Featured card */}
+            {featured && (
+              <FeaturedCard item={featured} num={globalNum(featured)} />
+            )}
 
-        {/* Card grid — key forces remount on filter change, enabling stagger */}
-        <div
-          key={active}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
-        >
-          {filtered.map((item, idx) => (
-            <CatalogueCard key={item.id} item={item} idx={idx} />
-          ))}
+            {/* Supporting cards */}
+            {rest.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                {rest.map((item, i) => (
+                  <SmallCard
+                    key={item.id}
+                    item={item}
+                    num={globalNum(item)}
+                    idx={i}
+                  />
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between mt-10 pt-8 border-t border-indigo/10">
+          <span className="eyebrow tabular-nums">
+            <span className="text-indigo font-semibold opacity-100">
+              {String(page + 1).padStart(2, "0")}
+            </span>
+            <span className="opacity-30"> / {String(totalPages).padStart(2, "0")}</span>
+            <span className="opacity-25 ml-3 hidden md:inline">
+              · {filtered.length} automation{filtered.length !== 1 ? "s" : ""}
+            </span>
+          </span>
+
+          <div className="flex items-center gap-4">
+            {/* Progress pips */}
+            <div className="hidden md:flex items-center gap-2">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => navigate(i)}
+                  aria-label={`Page ${i + 1}`}
+                  className="transition-all duration-300 rounded-full"
+                  style={{
+                    width: i === page ? 22 : 6,
+                    height: 6,
+                    backgroundColor:
+                      i === page
+                        ? "#FF6B5C"
+                        : "rgba(26,43,71,0.18)",
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Prev / Next */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate(page - 1)}
+                disabled={page === 0}
+                aria-label="Previous page"
+                className="w-11 h-11 rounded-full border border-indigo/15 flex items-center justify-center text-indigo text-[18px] font-display transition-all duration-200 hover:border-indigo/40 hover:bg-indigo/5 disabled:opacity-20 disabled:cursor-not-allowed"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => navigate(page + 1)}
+                disabled={page >= totalPages - 1}
+                aria-label="Next page"
+                className="w-11 h-11 rounded-full border border-indigo/15 flex items-center justify-center text-indigo text-[18px] font-display transition-all duration-200 hover:border-indigo/40 hover:bg-indigo/5 disabled:opacity-20 disabled:cursor-not-allowed"
+              >
+                →
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ─── Individual card ─────────────────────────────────────────────── */
+/* ─── Featured card (full-width, dark) ───────────────────────────── */
 
-function CatalogueCard({
+function FeaturedCard({
   item,
+  num,
+}: {
+  item: AutomationItem;
+  num: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <article
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative overflow-hidden rounded-[10px] bg-indigo text-dawn p-8 md:p-14 min-h-[260px] md:min-h-[310px] flex flex-col justify-between cursor-default"
+    >
+      {/* Dot texture */}
+      <div
+        className="absolute inset-0 dot-field opacity-[0.32] pointer-events-none"
+        aria-hidden
+      />
+
+      {/* Ghost catalogue number */}
+      <div
+        aria-hidden
+        className="absolute right-4 -bottom-6 font-display font-semibold leading-none tracking-[-0.06em] select-none pointer-events-none"
+        style={{
+          fontSize: "clamp(160px, 20vw, 260px)",
+          color: "rgba(255,248,232,0.05)",
+        }}
+      >
+        {num}
+      </div>
+
+      {/* Top row */}
+      <div className="relative flex items-center justify-between">
+        <span className="eyebrow opacity-45">{item.category}</span>
+        <div className="flex items-center gap-2">
+          <span
+            className="block w-1.5 h-1.5 rounded-full bg-stoep flex-shrink-0"
+            style={{ opacity: 0.7 }}
+            aria-hidden
+          />
+          <span className="eyebrow opacity-38 text-[9.5px]">
+            {item.timeSaved} saved
+          </span>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="relative mt-auto">
+        <h3 className="font-display font-semibold text-[32px] md:text-[44px] lg:text-[52px] tracking-[-0.025em] leading-[0.97] mb-5 max-w-[24ch]">
+          {item.name}
+          <span className="text-stoep">.</span>
+        </h3>
+
+        <div className="flex flex-col md:flex-row md:items-end gap-5 md:gap-10">
+          <p className="text-[14px] md:text-[15px] leading-[1.65] opacity-60 max-w-[56ch]">
+            {item.description}
+          </p>
+          <a
+            href="/about#contact"
+            style={{
+              opacity: hovered ? 1 : 0.72,
+              transform: hovered ? "translateX(0)" : "translateX(-4px)",
+              transition: "opacity 0.22s ease, transform 0.22s ease",
+            }}
+            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-stoep text-indigo rounded-full text-[12px] font-medium whitespace-nowrap self-start md:self-auto"
+          >
+            Talk to us about this →
+          </a>
+        </div>
+      </div>
+
+      {/* Hover accent bar */}
+      <div
+        className="absolute top-0 left-0 h-[3px] bg-stoep"
+        style={{
+          width: hovered ? "100%" : "0%",
+          transition: "width 0.6s cubic-bezier(0.22,1,0.36,1)",
+        }}
+      />
+    </article>
+  );
+}
+
+/* ─── Small card (3-up grid) ──────────────────────────────────────── */
+
+function SmallCard({
+  item,
+  num,
   idx,
 }: {
   item: AutomationItem;
+  num: string;
   idx: number;
 }) {
   const [hovered, setHovered] = useState(false);
-  const globalNum = String(
-    ALL_ITEMS.findIndex((i) => i.id === item.id) + 1
-  ).padStart(2, "0");
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.5,
-        delay: Math.min(idx * 0.05, 0.28),
+        duration: 0.42,
+        delay: 0.08 + idx * 0.07,
         ease: [0.22, 1, 0.36, 1],
       }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      className="relative bg-dawn border border-indigo/[0.09] rounded-[8px] overflow-hidden flex flex-col p-7 md:p-8"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative overflow-hidden rounded-[10px] border border-indigo/[0.09] bg-dawn p-6 md:p-8 flex flex-col cursor-default"
       style={{
+        transform: hovered ? "translateY(-3px)" : "translateY(0)",
         boxShadow: hovered
           ? "0 14px 44px rgba(26,43,71,0.10), 0 2px 6px rgba(26,43,71,0.05)"
           : "0 1px 3px rgba(26,43,71,0.04)",
-        transform: hovered ? "translateY(-3px)" : "translateY(0px)",
         transition:
-          "box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+          "transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease",
       }}
     >
-      {/* Top accent line — grows left-to-right on hover */}
-      <motion.div
+      {/* Accent bar */}
+      <div
         className="absolute top-0 left-0 h-[2px] bg-stoep"
-        animate={{ width: hovered ? "100%" : "0%" }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          width: hovered ? "100%" : "0%",
+          transition: "width 0.5s cubic-bezier(0.22,1,0.36,1)",
+        }}
       />
 
-      {/* Ghost index numeral */}
-      <div
-        aria-hidden
-        className="absolute -right-1 -bottom-5 font-display font-semibold leading-none tracking-[-0.06em] select-none pointer-events-none"
-        style={{
-          fontSize: "clamp(100px, 12vw, 140px)",
-          color: "rgba(26,43,71,0.038)",
-        }}
-      >
-        {globalNum}
+      {/* Number + category */}
+      <div className="flex items-center justify-between mb-5">
+        <span
+          className="font-display font-semibold text-[11px] tracking-[-0.01em]"
+          style={{ opacity: 0.18 }}
+        >
+          {num}
+        </span>
+        <span className="eyebrow opacity-32 text-[9px]">{item.category}</span>
       </div>
 
-      {/* Category label */}
-      <div className="eyebrow opacity-40 mb-4 text-[9.5px]">{item.category}</div>
-
-      {/* Automation name */}
-      <h3 className="relative font-display font-medium text-[21px] md:text-[24px] tracking-[-0.02em] leading-[1.1] mb-3">
+      {/* Name */}
+      <h3 className="font-display font-medium text-[22px] md:text-[26px] tracking-[-0.02em] leading-[1.1] flex-1">
         {item.name}
         <span className="text-stoep">.</span>
       </h3>
 
-      {/* Description */}
-      <p className="relative text-[13.5px] leading-[1.68] opacity-65 flex-1 mb-5 md:mb-6">
+      {/* Description — 2-line clamp */}
+      <p className="mt-3 text-[13px] leading-[1.62] opacity-52 line-clamp-2">
         {item.description}
       </p>
 
-      {/* Bottom row — time saved + CTA */}
-      <div className="relative pt-4 border-t border-indigo/[0.09] flex items-center justify-between gap-3 min-h-[28px]">
-        {/* Time saved */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span
-            aria-hidden
-            className="block w-1.5 h-1.5 rounded-full bg-stoep flex-shrink-0"
-            style={{ opacity: 0.6 }}
-          />
-          <span className="eyebrow opacity-45 text-[9.5px]">
-            {item.timeSaved} saved
-          </span>
-        </div>
-
-        {/* CTA — slides and fades in on hover */}
-        <motion.a
-          href="/about#contact"
-          animate={{
-            opacity: hovered ? 1 : 0,
-            x: hovered ? 0 : -6,
-          }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="eyebrow text-stoep text-[9.5px] whitespace-nowrap flex-shrink-0"
-          onClick={(e) => {
-            e.preventDefault();
-            document
-              .querySelector("#contact")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
-          Discuss this →
-        </motion.a>
+      {/* Time saved */}
+      <div className="mt-5 pt-4 border-t border-indigo/[0.08] flex items-center gap-2">
+        <span
+          className="block w-1.5 h-1.5 rounded-full bg-stoep flex-shrink-0"
+          style={{ opacity: 0.55 }}
+          aria-hidden
+        />
+        <span className="eyebrow opacity-38 text-[9.5px]">
+          {item.timeSaved} saved
+        </span>
       </div>
     </motion.article>
   );
