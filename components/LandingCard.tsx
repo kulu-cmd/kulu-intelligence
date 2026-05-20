@@ -356,9 +356,17 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           />
         )}
 
-        {/* ── Image — top portion, raw, no filters ── */}
-        <div className="relative flex-none overflow-hidden" style={{ height: "60%" }}>
-          {/* Label + arrow overlaid on image */}
+        {/* ── Image fills the card, text overlaid on top ── */}
+        <div className="relative flex-1 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={tile.image}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-kulu group-hover:scale-[1.04]"
+          />
+
+          {/* Label + arrow — top of image */}
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 pt-5 sm:px-7 sm:pt-6 md:px-8 md:pt-7">
             <span className="eyebrow opacity-65 text-[10px] sm:text-[11px]">
               {tile.label}
@@ -376,36 +384,29 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
             </span>
           </div>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={tile.image}
-            alt=""
-            aria-hidden
-            className="w-full h-full object-cover object-top transition-transform duration-700 ease-kulu group-hover:scale-[1.04]"
-          />
+          {/* Title + body — transparent overlay at bottom of image */}
+          <motion.div
+            style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
+            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-5 sm:px-7 sm:pb-6 md:px-8 md:pb-7"
+          >
+            <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
+              {tile.title}
+              <span className={`period ${periodColour[tile.surface]}`}>.</span>
+            </h3>
+            <p className="text-[12px] md:text-[13px] lg:text-[14px] leading-[1.5] max-w-[26ch] opacity-80">
+              {tile.body}
+            </p>
+          </motion.div>
         </div>
 
-        {/* ── Text area — below image ── */}
-        <motion.div
-          style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
-          className="flex flex-col items-center justify-center text-center gap-2 sm:gap-3 px-5 py-5 sm:px-7 sm:py-6 md:px-8 md:py-7 flex-1"
-        >
-          <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
-            {tile.title}
-            <span className={`period ${periodColour[tile.surface]}`}>.</span>
-          </h3>
-          <p className="text-[12px] md:text-[13px] lg:text-[14px] leading-[1.5] max-w-[26ch] opacity-80">
-            {tile.body}
-          </p>
-        </motion.div>
-
-        {/* ── Bottom meta ── */}
+        {/* ── Bottom meta — colour block only here ── */}
         <div
           className={[
-            "px-5 sm:px-7 md:px-8 pb-5 sm:pb-6 pt-3 mx-5 sm:mx-7 md:mx-8",
-            "border-t flex items-center justify-between gap-3",
+            "flex-none px-5 sm:px-7 md:px-8 py-4 sm:py-5",
+            "flex items-center justify-between gap-3",
             "text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium",
-            tile.surface === "indigo" ? "border-dawn/15 opacity-65" : "border-current/15 opacity-65",
+            tile.surface === "indigo" ? "opacity-80" : "opacity-80",
+            surfaceClasses[tile.surface],
           ].join(" ")}
         >
           <span className="truncate">{tile.meta}</span>
