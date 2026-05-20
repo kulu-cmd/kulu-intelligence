@@ -224,10 +224,10 @@ export function LandingCard() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/websitelogo.png"
+              src="/websitelogo-trim.png"
               alt="Kulu Intelligence"
-              className="w-auto object-contain -ml-4 sm:-ml-6 md:-ml-8"
-              style={{ height: "clamp(220px, 30vw, 400px)" }}
+              className="h-auto object-contain -ml-1"
+              style={{ width: "clamp(240px, 32vw, 360px)" }}
             />
           </motion.div>
         </div>
