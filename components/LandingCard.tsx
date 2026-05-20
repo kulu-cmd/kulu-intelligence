@@ -200,10 +200,21 @@ export function LandingCard() {
               INTELLIGENCE
             </span>
           </div>
-          <span className="eyebrow text-dawn/55 text-[10px] sm:text-[11px] tabular-nums hidden xs:block">
-            {now}
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/websitelogo.png"
+            alt="Kulu Intelligence"
+            className="h-8 sm:h-9 md:h-10 w-auto object-contain"
+          />
         </motion.div>
+
+        {/* Juggling balls — top right, below time */}
+        <div
+          className="absolute right-5 sm:right-8 md:right-12 lg:right-16"
+          style={{ top: "clamp(44px, 7svh, 72px)" }}
+        >
+          <JugglingBalls />
+        </div>
 
         {/* Centre lockup */}
         <div className="relative">
@@ -265,6 +276,82 @@ export function LandingCard() {
         ))}
       </section>
     </div>
+  );
+}
+
+/* ─── Floating Balls ────────────────────────────────────────────────────── */
+function JugglingBalls() {
+  const balls = [
+    {
+      color: "#ff6b5c",
+      size: 68,
+      top: 0,
+      left: 0,
+      duration: 7,
+      yRange: [-14, 6],
+      xRange: [5, -4],
+      scaleRange: [1, 1.07, 0.96, 1],
+      rotateRange: [-4, 3, -2, 0],
+    },
+    {
+      color: "#ffd66b",
+      size: 50,
+      top: 42,
+      left: 50,
+      duration: 9,
+      yRange: [-10, 8],
+      xRange: [-7, 5],
+      scaleRange: [1, 1.09, 0.94, 1],
+      rotateRange: [3, -5, 4, 0],
+    },
+    {
+      color: "#b8e0d2",
+      size: 26,
+      top: 86,
+      left: 96,
+      duration: 5.5,
+      yRange: [-18, 10],
+      xRange: [9, -7],
+      scaleRange: [1, 1.13, 0.91, 1],
+      rotateRange: [-6, 7, -5, 0],
+    },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.4, duration: 1 }}
+      aria-hidden
+      className="relative"
+      style={{ width: 130, height: 128 }}
+    >
+      {balls.map((ball, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: ball.size,
+            height: ball.size,
+            backgroundColor: ball.color,
+            top: ball.top,
+            left: ball.left,
+          }}
+          animate={{
+            y: [0, ball.yRange[0], ball.yRange[1], ball.yRange[0] * 0.5, 0],
+            x: [0, ball.xRange[0], ball.xRange[1], ball.xRange[0] * 0.4, 0],
+            scale: ball.scaleRange,
+            rotate: ball.rotateRange,
+          }}
+          transition={{
+            duration: ball.duration,
+            repeat: Infinity,
+            ease: "easeInOut",
+            repeatType: "mirror",
+          }}
+        />
+      ))}
+    </motion.div>
   );
 }
 
@@ -387,7 +474,7 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           {/* Title + body — transparent overlay at bottom of image */}
           <motion.div
             style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
-            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-5 sm:px-7 sm:pb-6 md:px-8 md:pb-7"
+            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-2 sm:px-7 sm:pb-3 md:px-8 md:pb-4"
           >
             <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
               {tile.title}
@@ -399,21 +486,6 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           </motion.div>
         </div>
 
-        {/* ── Bottom meta — colour block only here ── */}
-        <div
-          className={[
-            "flex-none px-5 sm:px-7 md:px-8 py-4 sm:py-5",
-            "flex items-center justify-between gap-3",
-            "text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium",
-            tile.surface === "indigo" ? "opacity-80" : "opacity-80",
-            surfaceClasses[tile.surface],
-          ].join(" ")}
-        >
-          <span className="truncate">{tile.meta}</span>
-          <span className="font-display normal-case tracking-normal text-[14px] sm:text-[15px] shrink-0">
-            →
-          </span>
-        </div>
       </a>
     </motion.div>
   );
