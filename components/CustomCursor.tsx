@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 
 /**
- * CustomCursor — a coral dot that follows the cursor with spring physics.
- * Grows and softens when over interactive elements (a, button, [data-cursor]).
- * Disabled on touch / coarse-pointer devices and when prefers-reduced-motion.
+ * CustomCursor — coral dot that snaps exactly to the cursor (no position spring,
+ * so zero lag) and morphs smoothly to a larger ring on interactive elements.
+ *
+ * Position: direct motion values (instant, no spring)
+ * Size / colour: spring on the inner div only
  */
 export function CustomCursor() {
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const springConfig = { damping: 22, stiffness: 250, mass: 0.5 };
-  const sx = useSpring(x, springConfig);
-  const sy = useSpring(y, springConfig);
 
   const [variant, setVariant] = useState<"default" | "hover" | "label">("default");
   const [label, setLabel] = useState<string>("");
@@ -60,12 +59,12 @@ export function CustomCursor() {
 
   if (!active) return null;
 
-  const size = variant === "label" ? 92 : variant === "hover" ? 48 : 14;
+  const size = variant === "label" ? 86 : variant === "hover" ? 42 : 10;
 
   return (
     <motion.div
-      className="pointer-events-none fixed top-0 left-0 z-[120] mix-blend-difference"
-      style={{ x: sx, y: sy }}
+      className="pointer-events-none fixed top-0 left-0 z-[120]"
+      style={{ x, y }}
       aria-hidden
     >
       <motion.div
@@ -74,12 +73,22 @@ export function CustomCursor() {
           height: size,
           marginLeft: -size / 2,
           marginTop: -size / 2,
-          backgroundColor: variant === "default" ? "#FF6B5C" : "#FFF8E8",
-          color: "#1A2B47",
+          backgroundColor:
+            variant === "default" ? "#FF6B5C" : "rgba(26,43,71,0.10)",
+          borderColor:
+            variant === "default"
+              ? "transparent"
+              : "rgba(26,43,71,0.25)",
+          borderWidth: variant === "default" ? 0 : 1,
         }}
-        transition={{ type: "spring", damping: 22, stiffness: 280 }}
-        className="rounded-full flex items-center justify-center font-medium tracking-wide"
-        style={{ fontSize: variant === "label" ? 12 : 0 }}
+        transition={{ type: "spring", damping: 26, stiffness: 360, mass: 0.22 }}
+        className="rounded-full flex items-center justify-center font-medium border"
+        style={{
+          fontSize: variant === "label" ? 11 : 0,
+          color: "#1A2B47",
+          letterSpacing: "0.04em",
+          borderStyle: "solid",
+        }}
       >
         {variant === "label" ? label : null}
       </motion.div>

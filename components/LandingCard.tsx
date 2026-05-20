@@ -91,13 +91,6 @@ const accentLineColour: Record<Surface, string> = {
 
 const letters = ["K", "u", "l", "u"];
 
-const industries = [
-  "Property",
-  "Marketing",
-  "Accounting & finance",
-  "HR agencies",
-];
-
 export function LandingCard() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const mx = useMotionValue(0.5);
@@ -200,18 +193,6 @@ export function LandingCard() {
             <span className="descriptor text-[8.5px] text-dawn/55 hidden sm:inline">
               INTELLIGENCE
             </span>
-            <span className="block w-px h-3 bg-dawn/20 hidden sm:inline-block" aria-hidden />
-            <div className="hidden sm:flex items-center gap-2">
-              <motion.span
-                className="block w-1.5 h-1.5 rounded-full bg-stoep"
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-                aria-hidden
-              />
-              <span className="eyebrow text-dawn/65 text-[10px] sm:text-[11px]">
-                An African AI consultancy for professional firms
-              </span>
-            </div>
           </div>
           <span className="eyebrow text-dawn/55 text-[10px] sm:text-[11px] tabular-nums hidden xs:block">
             {now}
@@ -219,7 +200,7 @@ export function LandingCard() {
         </motion.div>
 
         {/* Centre lockup */}
-        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-8">
+        <div className="relative">
           <motion.div style={{ x: wordX, y: wordY }} className="will-change-transform">
             <h1
               aria-label="Kulu."
@@ -265,58 +246,8 @@ export function LandingCard() {
               INTELLIGENCE
             </motion.div>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.7 }}
-            className="text-left sm:text-right max-w-[40ch] sm:max-w-[32ch]"
-          >
-            <p className="font-display italic text-[16px] sm:text-[20px] md:text-[24px] tracking-[-0.01em] text-dawn/90 leading-[1.15]">
-              AI literacy and implementation, for the firms that actually run things<span className="text-stoep">.</span>
-            </p>
-            <p className="hidden sm:block text-[12px] md:text-[13px] leading-[1.55] text-dawn/55 mt-3 md:mt-4">
-              Taught to your partners and teams. Built into your operations.
-            </p>
-          </motion.div>
         </div>
       </section>
-
-      {/* ─── INDUSTRIES STRIP ─── */}
-      <motion.section
-        aria-label="Industries served"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.15, duration: 0.6 }}
-        className="relative shrink-0 border-y border-dawn/15"
-      >
-        <div className="px-5 sm:px-8 md:px-12 lg:px-16 py-3 md:py-3.5 flex items-center gap-4 md:gap-6 overflow-hidden">
-          <span className="eyebrow text-dawn/55 text-[9.5px] sm:text-[10px] shrink-0">
-            For
-          </span>
-          <ul
-            className="flex items-center gap-4 md:gap-7 lg:gap-10 text-[11px] sm:text-[12px] md:text-[13px] font-medium text-dawn/80 whitespace-nowrap overflow-x-auto no-scrollbar"
-            style={{ scrollbarWidth: "none" }}
-          >
-            {industries.map((industry, i) => (
-              <motion.li
-                key={industry}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2 + i * 0.06, duration: 0.5 }}
-                className="flex items-center gap-4 md:gap-7 lg:gap-10"
-              >
-                <span>{industry}</span>
-                {i < industries.length - 1 && (
-                  <span className="text-stoep/70" aria-hidden>
-                    ◆
-                  </span>
-                )}
-              </motion.li>
-            ))}
-          </ul>
-        </div>
-      </motion.section>
 
       {/* ─── TILES ─── */}
       <section

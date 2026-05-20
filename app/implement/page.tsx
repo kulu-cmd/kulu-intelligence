@@ -5,6 +5,7 @@ import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
 import { CustomCursor } from "@/components/CustomCursor";
 import { PageEnter } from "@/components/PageEnter";
+import { AutomationCatalogue } from "@/components/AutomationCatalogue";
 
 const phases = [
   {
@@ -170,6 +171,9 @@ export default function ImplementPage() {
           </div>
         </section>
 
+        {/* Automation catalogue */}
+        <AutomationCatalogue />
+
         {/* Pull quote */}
         <section className="py-24 md:py-40">
           <div className="mx-auto max-w-[1480px] px-6 md:px-12">
@@ -188,7 +192,7 @@ export default function ImplementPage() {
           <div className="absolute inset-0 dot-field opacity-50 pointer-events-none" aria-hidden />
           <div className="relative mx-auto max-w-[1480px] px-6 md:px-12 py-24 md:py-32 flex flex-col md:flex-row gap-10 md:items-end md:justify-between">
             <Reveal>
-              <div className="eyebrow opacity-70">04 — Start the conversation</div>
+              <div className="eyebrow opacity-70">05 — Start the conversation</div>
               <h2 className="mt-4 font-display font-semibold text-[40px] md:text-[64px] lg:text-[80px] leading-[0.95] tracking-[-0.035em] max-w-[20ch]">
                 Where is the work going slow<span className="text-stoep">?</span>
               </h2>

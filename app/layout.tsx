@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   description:
     "An African AI consultancy. We teach teams how to use AI, and we build the workflows that make it stick. Plain talk, real tools, live before month-end.",
   metadataBase: new URL("https://kulu.co.za"),
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
   openGraph: {
     title: "Kulu Intelligence — AI, made human.",
     description:
