@@ -226,8 +226,8 @@ export function LandingCard() {
             <img
               src="/websitelogo.png"
               alt="Kulu Intelligence"
-              className="w-auto object-contain"
-              style={{ height: "clamp(130px, 18vw, 240px)" }}
+              className="w-auto object-contain -ml-4 sm:-ml-6 md:-ml-8"
+              style={{ height: "clamp(220px, 30vw, 400px)" }}
             />
           </motion.div>
         </div>
@@ -252,9 +252,9 @@ export function LandingCard() {
    Each ball also pulses gently on its own slower cycle.
 ────────────────────────────────────────────────────────────────────────── */
 function JugglingBalls() {
-  // Orbit geometry — centre at (80, 80), radius 44px, container 160×160
-  const CX = 80, CY = 80, R = 44;
-  const CONTAINER = 160;
+  // Orbit geometry — centre at (124, 124), radius 88px, container 248×248
+  const CX = 124, CY = 124, R = 88;
+  const CONTAINER = 248;
 
   const balls = [
     { color: "#ff6b5c", size: 68, angleDeg: -90  }, // top    — large coral
@@ -427,7 +427,7 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           {/* Title + body — transparent overlay at bottom of image */}
           <motion.div
             style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
-            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-2 sm:px-7 sm:pb-3 md:px-8 md:pb-4"
+            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-5 sm:px-7 sm:pb-6 md:px-8 md:pb-7"
           >
             <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
               {tile.title}
