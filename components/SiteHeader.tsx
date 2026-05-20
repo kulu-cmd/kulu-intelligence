@@ -45,7 +45,7 @@ export function SiteHeader({
         tone,
       ].join(" ")}
     >
-      <div className="mx-auto max-w-[1640px] px-5 sm:px-8 md:px-10 lg:px-12 py-4 md:py-5 flex items-center justify-between">
+      <div className="mx-auto max-w-[1640px] px-3 sm:px-8 md:px-10 lg:px-12 py-4 md:py-5 flex items-center justify-between gap-2">
         <Link
           href="/"
           className="flex items-baseline gap-2.5 group"
@@ -63,13 +63,13 @@ export function SiteHeader({
 
         {!minimal && (
           <nav aria-label="Primary">
-            <ul className="flex items-center gap-1">
+            <ul className="flex items-center gap-0 sm:gap-1">
               {nav.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     data-cursor
-                    className="relative inline-flex items-center px-3 py-2 text-[13px] tracking-[-0.005em] group"
+                    className="relative inline-flex items-center px-2 sm:px-3 py-2 text-[12px] sm:text-[13px] tracking-[-0.005em] group"
                   >
                     <span className="relative z-10">{item.label}</span>
                     <span className="absolute inset-x-2 inset-y-1 rounded-full bg-current opacity-0 group-hover:opacity-[0.08] transition-opacity duration-300" />

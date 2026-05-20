@@ -141,8 +141,7 @@ export function LandingCard() {
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-0 flex flex-col bg-indigo text-dawn overflow-hidden"
-      style={{ height: "100svh" }}
+      className="relative lg:fixed lg:inset-0 flex flex-col bg-indigo text-dawn overflow-x-hidden min-h-[100svh] lg:h-[100svh] lg:overflow-hidden"
     >
       {/* ─── HERO STRIP (slightly taller now that tiles are 30% shorter) ─── */}
       <section
@@ -207,7 +206,7 @@ export function LandingCard() {
 
         {/* Juggling balls — top right, below time */}
         <div
-          className="absolute right-5 sm:right-8 md:right-12 lg:right-16"
+          className="absolute right-5 sm:right-8 md:right-12 lg:right-16 scale-[0.45] sm:scale-75 lg:scale-100 origin-top-right"
           style={{ top: "clamp(44px, 7svh, 72px)" }}
         >
           <JugglingBalls />
@@ -236,7 +235,7 @@ export function LandingCard() {
       {/* ─── TILES ─── */}
       <section
         aria-label="Choose a path"
-        className="relative flex-1 min-h-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 grid-rows-4 sm:grid-rows-2 lg:grid-rows-1"
+        className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-2 lg:grid-rows-1 lg:flex-1 lg:min-h-0"
       >
         {tiles.map((tile, idx) => (
           <TileCell key={tile.href} tile={tile} idx={idx} />
@@ -372,6 +371,7 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
         data-cursor-label="Open →"
         className={[
           "tile group relative flex flex-col h-full w-full overflow-hidden",
+          "min-h-[300px] sm:min-h-[340px] lg:min-h-0",
           "transition-colors duration-500",
           surfaceClasses[tile.surface],
         ].join(" ")}
