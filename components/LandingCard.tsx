@@ -200,12 +200,9 @@ export function LandingCard() {
               INTELLIGENCE
             </span>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/websitelogo.png"
-            alt="Kulu Intelligence"
-            className="h-8 sm:h-9 md:h-10 w-auto object-contain"
-          />
+          <span className="eyebrow text-dawn/55 text-[10px] sm:text-[11px] tabular-nums hidden xs:block">
+            {now}
+          </span>
         </motion.div>
 
         {/* Juggling balls — top right, below time */}
@@ -216,52 +213,22 @@ export function LandingCard() {
           <JugglingBalls />
         </div>
 
-        {/* Centre lockup */}
+        {/* Centre lockup — logo image replaces wordmark */}
         <div className="relative">
-          <motion.div style={{ x: wordX, y: wordY }} className="will-change-transform">
-            <h1
-              aria-label="Kulu."
-              className="font-display font-semibold leading-[0.85] tracking-[-0.05em] text-[clamp(64px,12vw,164px)] flex items-baseline"
-            >
-              {letters.map((char, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ y: "110%", opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    delay: 0.3 + i * 0.07,
-                    duration: 0.9,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="inline-block"
-                >
-                  {char}
-                </motion.span>
-              ))}
-              <motion.span
-                initial={{ scale: 0, y: -24, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                transition={{
-                  delay: 0.62,
-                  duration: 0.9,
-                  type: "spring",
-                  stiffness: 320,
-                  damping: 14,
-                }}
-                className="inline-block text-stoep"
-                aria-hidden
-              >
-                .
-              </motion.span>
-            </h1>
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.6 }}
-              className="descriptor text-[10px] sm:text-[11px] md:text-[12px] text-dawn/65 mt-2 sm:mt-3"
-            >
-              INTELLIGENCE
-            </motion.div>
+          <motion.div
+            style={{ x: wordX, y: wordY }}
+            className="will-change-transform"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/websitelogo.png"
+              alt="Kulu Intelligence"
+              className="w-auto object-contain"
+              style={{ height: "clamp(130px, 18vw, 240px)" }}
+            />
           </motion.div>
         </div>
       </section>
@@ -279,42 +246,20 @@ export function LandingCard() {
   );
 }
 
-/* ─── Floating Balls ────────────────────────────────────────────────────── */
+/* ─── Orbiting Balls ─────────────────────────────────────────────────────
+   Three balls equally spaced 120° apart on a shared circular orbit.
+   The orbit div rotates — balls travel together, never overlapping.
+   Each ball also pulses gently on its own slower cycle.
+────────────────────────────────────────────────────────────────────────── */
 function JugglingBalls() {
+  // Orbit geometry — centre at (80, 80), radius 44px, container 160×160
+  const CX = 80, CY = 80, R = 44;
+  const CONTAINER = 160;
+
   const balls = [
-    {
-      color: "#ff6b5c",
-      size: 68,
-      top: 0,
-      left: 0,
-      duration: 7,
-      yRange: [-14, 6],
-      xRange: [5, -4],
-      scaleRange: [1, 1.07, 0.96, 1],
-      rotateRange: [-4, 3, -2, 0],
-    },
-    {
-      color: "#ffd66b",
-      size: 50,
-      top: 42,
-      left: 50,
-      duration: 9,
-      yRange: [-10, 8],
-      xRange: [-7, 5],
-      scaleRange: [1, 1.09, 0.94, 1],
-      rotateRange: [3, -5, 4, 0],
-    },
-    {
-      color: "#b8e0d2",
-      size: 26,
-      top: 86,
-      left: 96,
-      duration: 5.5,
-      yRange: [-18, 10],
-      xRange: [9, -7],
-      scaleRange: [1, 1.13, 0.91, 1],
-      rotateRange: [-6, 7, -5, 0],
-    },
+    { color: "#ff6b5c", size: 68, angleDeg: -90  }, // top    — large coral
+    { color: "#ffd66b", size: 50, angleDeg:  30  }, // bottom-right — medium yellow
+    { color: "#b8e0d2", size: 26, angleDeg: 150  }, // bottom-left  — small mint
   ];
 
   return (
@@ -323,34 +268,42 @@ function JugglingBalls() {
       animate={{ opacity: 1 }}
       transition={{ delay: 1.4, duration: 1 }}
       aria-hidden
-      className="relative"
-      style={{ width: 130, height: 128 }}
+      style={{ width: CONTAINER, height: CONTAINER, position: "relative" }}
     >
-      {balls.map((ball, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full"
-          style={{
-            width: ball.size,
-            height: ball.size,
-            backgroundColor: ball.color,
-            top: ball.top,
-            left: ball.left,
-          }}
-          animate={{
-            y: [0, ball.yRange[0], ball.yRange[1], ball.yRange[0] * 0.5, 0],
-            x: [0, ball.xRange[0], ball.xRange[1], ball.xRange[0] * 0.4, 0],
-            scale: ball.scaleRange,
-            rotate: ball.rotateRange,
-          }}
-          transition={{
-            duration: ball.duration,
-            repeat: Infinity,
-            ease: "easeInOut",
-            repeatType: "mirror",
-          }}
-        />
-      ))}
+      {/* Orbit ring — rotates all balls together */}
+      <motion.div
+        style={{ width: CONTAINER, height: CONTAINER, position: "absolute", inset: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+      >
+        {balls.map((ball, i) => {
+          const rad = (ball.angleDeg * Math.PI) / 180;
+          const cx  = CX + R * Math.cos(rad);
+          const cy  = CY + R * Math.sin(rad);
+          const r   = ball.size / 2;
+          return (
+            /* Pulse wrapper — independent slow breathing per ball */
+            <motion.div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width:           ball.size,
+                height:          ball.size,
+                backgroundColor: ball.color,
+                left:            cx - r,
+                top:             cy - r,
+              }}
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{
+                duration:   3.5 + i * 1.2,
+                repeat:     Infinity,
+                ease:       "easeInOut",
+                repeatType: "mirror",
+              }}
+            />
+          );
+        })}
+      </motion.div>
     </motion.div>
   );
 }
