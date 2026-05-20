@@ -5,12 +5,18 @@ import { LandingCard } from "@/components/LandingCard";
 import { CustomCursor } from "@/components/CustomCursor";
 
 export default function HomePage() {
-  // Lock body scroll while on the landing — the four tiles are the navigation.
+  // Lock body scroll only on desktop (lg+), where the fixed single-screen
+  // layout fits one viewport. On mobile/tablet the tiles stack and scroll.
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = () => {
+      document.body.style.overflow = mq.matches ? "hidden" : "";
+    };
+    apply();
+    mq.addEventListener("change", apply);
     return () => {
-      document.body.style.overflow = prev;
+      mq.removeEventListener("change", apply);
+      document.body.style.overflow = "";
     };
   }, []);
 

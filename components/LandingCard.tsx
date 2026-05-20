@@ -31,6 +31,7 @@ type Tile = {
   meta: string;
   href: string;
   surface: Surface;
+  image: string;
 };
 
 const tiles: Tile[] = [
@@ -41,6 +42,7 @@ const tiles: Tile[] = [
     meta: "60 — 120 min",
     href: "/learn",
     surface: "dawn",
+    image: "/seminars.png",
   },
   {
     label: "Implement",
@@ -49,6 +51,7 @@ const tiles: Tile[] = [
     meta: "From R8,500",
     href: "/implement",
     surface: "indigo",
+    image: "/workflows.png",
   },
   {
     label: "Practice",
@@ -57,6 +60,7 @@ const tiles: Tile[] = [
     meta: "37 engagements",
     href: "/case-studies",
     surface: "coral",
+    image: "/testimonials.png",
   },
   {
     label: "Approach",
@@ -65,6 +69,7 @@ const tiles: Tile[] = [
     meta: "Johannesburg · 2026",
     href: "/about",
     surface: "mielie",
+    image: "/why-kulu.png",
   },
 ];
 
@@ -88,6 +93,7 @@ const accentLineColour: Record<Surface, string> = {
   coral: "bg-dawn",
   mielie: "bg-stoep",
 };
+
 
 const letters = ["K", "u", "l", "u"];
 
@@ -135,8 +141,7 @@ export function LandingCard() {
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-0 flex flex-col bg-indigo text-dawn overflow-hidden"
-      style={{ height: "100svh" }}
+      className="relative lg:fixed lg:inset-0 flex flex-col bg-indigo text-dawn overflow-x-hidden min-h-[100svh] lg:h-[100svh] lg:overflow-hidden"
     >
       {/* ─── HERO STRIP (slightly taller now that tiles are 30% shorter) ─── */}
       <section
@@ -199,52 +204,30 @@ export function LandingCard() {
           </span>
         </motion.div>
 
-        {/* Centre lockup */}
+        {/* Juggling balls — top right, below time */}
+        <div
+          className="absolute right-5 sm:right-8 md:right-12 lg:right-16 scale-[0.45] sm:scale-75 lg:scale-100 origin-top-right"
+          style={{ top: "clamp(44px, 7svh, 72px)" }}
+        >
+          <JugglingBalls />
+        </div>
+
+        {/* Centre lockup — logo image replaces wordmark */}
         <div className="relative">
-          <motion.div style={{ x: wordX, y: wordY }} className="will-change-transform">
-            <h1
-              aria-label="Kulu."
-              className="font-display font-semibold leading-[0.85] tracking-[-0.05em] text-[clamp(64px,12vw,164px)] flex items-baseline"
-            >
-              {letters.map((char, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ y: "110%", opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    delay: 0.3 + i * 0.07,
-                    duration: 0.9,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="inline-block"
-                >
-                  {char}
-                </motion.span>
-              ))}
-              <motion.span
-                initial={{ scale: 0, y: -24, opacity: 0 }}
-                animate={{ scale: 1, y: 0, opacity: 1 }}
-                transition={{
-                  delay: 0.62,
-                  duration: 0.9,
-                  type: "spring",
-                  stiffness: 320,
-                  damping: 14,
-                }}
-                className="inline-block text-stoep"
-                aria-hidden
-              >
-                .
-              </motion.span>
-            </h1>
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.6 }}
-              className="descriptor text-[10px] sm:text-[11px] md:text-[12px] text-dawn/65 mt-2 sm:mt-3"
-            >
-              INTELLIGENCE
-            </motion.div>
+          <motion.div
+            style={{ x: wordX, y: wordY }}
+            className="will-change-transform"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/websitelogo-trim.png"
+              alt="Kulu Intelligence"
+              className="h-auto object-contain -ml-1"
+              style={{ width: "clamp(240px, 32vw, 360px)" }}
+            />
           </motion.div>
         </div>
       </section>
@@ -252,13 +235,75 @@ export function LandingCard() {
       {/* ─── TILES ─── */}
       <section
         aria-label="Choose a path"
-        className="relative flex-1 min-h-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 grid-rows-4 sm:grid-rows-2 lg:grid-rows-1"
+        className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:grid-rows-2 lg:grid-rows-1 lg:flex-1 lg:min-h-0"
       >
         {tiles.map((tile, idx) => (
           <TileCell key={tile.href} tile={tile} idx={idx} />
         ))}
       </section>
     </div>
+  );
+}
+
+/* ─── Orbiting Balls ─────────────────────────────────────────────────────
+   Three balls equally spaced 120° apart on a shared circular orbit.
+   The orbit div rotates — balls travel together, never overlapping.
+   Each ball also pulses gently on its own slower cycle.
+────────────────────────────────────────────────────────────────────────── */
+function JugglingBalls() {
+  // Orbit geometry — centre at (124, 124), radius 88px, container 248×248
+  const CX = 124, CY = 124, R = 88;
+  const CONTAINER = 248;
+
+  const balls = [
+    { color: "#ff6b5c", size: 68, angleDeg: -90  }, // top    — large coral
+    { color: "#ffd66b", size: 50, angleDeg:  30  }, // bottom-right — medium yellow
+    { color: "#b8e0d2", size: 26, angleDeg: 150  }, // bottom-left  — small mint
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.4, duration: 1 }}
+      aria-hidden
+      style={{ width: CONTAINER, height: CONTAINER, position: "relative" }}
+    >
+      {/* Orbit ring — rotates all balls together */}
+      <motion.div
+        style={{ width: CONTAINER, height: CONTAINER, position: "absolute", inset: 0 }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+      >
+        {balls.map((ball, i) => {
+          const rad = (ball.angleDeg * Math.PI) / 180;
+          const cx  = CX + R * Math.cos(rad);
+          const cy  = CY + R * Math.sin(rad);
+          const r   = ball.size / 2;
+          return (
+            /* Pulse wrapper — independent slow breathing per ball */
+            <motion.div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width:           ball.size,
+                height:          ball.size,
+                backgroundColor: ball.color,
+                left:            cx - r,
+                top:             cy - r,
+              }}
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{
+                duration:   3.5 + i * 1.2,
+                repeat:     Infinity,
+                ease:       "easeInOut",
+                repeatType: "mirror",
+              }}
+            />
+          );
+        })}
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -325,29 +370,17 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
         data-cursor
         data-cursor-label="Open →"
         className={[
-          "tile group relative block h-full w-full overflow-hidden text-center",
-          "px-5 py-6 sm:p-7 md:p-8",
+          "tile group relative flex flex-col h-full w-full overflow-hidden",
+          "min-h-[300px] sm:min-h-[340px] lg:min-h-0",
           "transition-colors duration-500",
           surfaceClasses[tile.surface],
         ].join(" ")}
       >
-        {/* Inner glow on hover */}
-        <motion.div
-          aria-hidden
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{
-            background:
-              tile.surface === "indigo"
-                ? "radial-gradient(circle at 50% 50%, rgba(255,107,92,0.12), transparent 60%)"
-                : "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), transparent 60%)",
-          }}
-        />
-
         {/* Accent line — grows in from centre on hover */}
         <span
           aria-hidden
           className={[
-            "absolute left-1/2 -translate-x-1/2 top-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 ease-kulu",
+            "absolute left-1/2 -translate-x-1/2 top-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 ease-kulu z-10",
             accentLineColour[tile.surface],
           ].join(" ")}
         />
@@ -357,58 +390,38 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           <span
             aria-hidden
             className={[
-              "hidden lg:block absolute left-0 top-6 bottom-6 w-px",
+              "hidden lg:block absolute left-0 top-6 bottom-6 w-px z-10",
               tile.surface === "indigo" ? "bg-dawn/15" : "bg-indigo/10",
             ].join(" ")}
           />
         )}
 
-        {/* Top row — label + open arrow */}
-        <div className="relative flex items-center justify-between text-left">
-          <span className="eyebrow opacity-65 text-[10px] sm:text-[11px]">
-            {tile.label}
-          </span>
-          <span className="eyebrow opacity-65 text-[10px] sm:text-[11px] inline-flex items-center gap-1">
-            <span>Open</span>
-            <motion.span
-              className="inline-block"
-              initial={false}
-              animate={{ x: 0 }}
-              whileHover={{ x: 4 }}
-            >
-              →
-            </motion.span>
-          </span>
+        {/* ── Image fills the card, text overlaid on top ── */}
+        <div className="relative flex-1 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={tile.image}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-kulu group-hover:scale-[1.04]"
+          />
+
+
+          {/* Title + body — transparent overlay at bottom of image */}
+          <motion.div
+            style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
+            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-5 sm:px-7 sm:pb-6 md:px-8 md:pb-7"
+          >
+            <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
+              {tile.title}
+              <span className={`period ${periodColour[tile.surface]}`}>.</span>
+            </h3>
+            <p className="text-[12px] md:text-[13px] lg:text-[14px] leading-[1.5] max-w-[26ch] opacity-80">
+              {tile.body}
+            </p>
+          </motion.div>
         </div>
 
-        {/* Centred content */}
-        <motion.div
-          style={{ x: tx, y: ty, rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-          className="relative h-full flex flex-col items-center justify-center gap-3 sm:gap-4 pt-8 pb-10 sm:pt-10 sm:pb-12"
-        >
-          <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(30px,3.5vw,46px)]">
-            {tile.title}
-            <span className={`period ${periodColour[tile.surface]}`}>.</span>
-          </h3>
-          <p className="hidden md:block text-[13px] lg:text-[14px] leading-[1.5] max-w-[28ch] opacity-80">
-            {tile.body}
-          </p>
-        </motion.div>
-
-        {/* Bottom — meta */}
-        <div
-          className={[
-            "absolute bottom-5 sm:bottom-6 left-5 right-5 sm:left-7 sm:right-7 md:left-8 md:right-8",
-            "pt-3 border-t flex items-center justify-between gap-3",
-            "text-[10px] sm:text-[11px] tracking-[0.16em] uppercase font-medium",
-            tile.surface === "indigo" ? "border-dawn/15 opacity-65" : "border-current/15 opacity-65",
-          ].join(" ")}
-        >
-          <span className="truncate">{tile.meta}</span>
-          <span className="font-display normal-case tracking-normal text-[14px] sm:text-[15px] shrink-0">
-            →
-          </span>
-        </div>
       </a>
     </motion.div>
   );
