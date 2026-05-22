@@ -8,8 +8,8 @@ import { KuluMonogram } from "./KuluWordmark";
 const nav = [
   { href: "/learn", label: "Learn" },
   { href: "/implement", label: "Implement" },
-  { href: "/case-studies", label: "Practice" },
-  { href: "/about", label: "Approach" },
+  { href: "/case-studies", label: "Testimonials" },
+  { href: "/about", label: "Why Kulu" },
 ];
 
 /**
@@ -36,9 +36,9 @@ export function SiteHeader({
 
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, delay: 0.1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.45, delay: 0.4 }}
       className={[
         "fixed top-0 left-0 right-0 z-50 transition-colors duration-500",
         bg,

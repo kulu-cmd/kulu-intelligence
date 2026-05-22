@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PageHero } from "@/components/PageHero";
@@ -37,10 +36,38 @@ const covers = [
 ];
 
 const industries = [
-  "Property",
-  "Marketing",
-  "Accounting & finance",
-  "HR agencies",
+  {
+    name: "Property",
+    tasks: [
+      "Draft lease summaries and inspection reports",
+      "Automate listing descriptions from agent notes",
+      "Screen tenant applications against criteria",
+    ],
+  },
+  {
+    name: "Marketing",
+    tasks: [
+      "Brief-to-copy in minutes, not days",
+      "Repurpose long-form content across channels",
+      "Analyse campaign data and surface the insight",
+    ],
+  },
+  {
+    name: "Accounting & finance",
+    tasks: [
+      "Reconcile and flag anomalies faster",
+      "Summarise management accounts for partners",
+      "Draft client-ready commentary from numbers",
+    ],
+  },
+  {
+    name: "HR agencies",
+    tasks: [
+      "Screen CVs against role requirements at scale",
+      "Draft job briefs from a short intake call",
+      "Summarise candidate interview notes",
+    ],
+  },
 ];
 
 export default function LearnPage() {
@@ -140,49 +167,38 @@ export default function LearnPage() {
         </section>
 
         {/* Industries */}
-        <section className="py-24 md:py-32">
-          <div className="mx-auto max-w-[1480px] px-6 md:px-12">
-            <Reveal>
-              <div className="eyebrow opacity-55">04 — Industries we work with</div>
-              <h3 className="mt-5 font-display font-medium text-[28px] md:text-[40px] tracking-[-0.02em] leading-[1.1] max-w-[28ch]">
-                Tuned to how your firm actually operates<span className="text-stoep">.</span>
-              </h3>
-              <div className="mt-8 flex flex-wrap gap-2.5">
-                {industries.map((i) => (
-                  <span
-                    key={i}
-                    className="px-5 py-2.5 rounded-full border border-indigo/25 text-[14px] leading-none hover:bg-indigo hover:text-dawn transition-colors duration-300"
-                  >
-                    {i}
-                  </span>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="relative overflow-hidden bg-stoep text-indigo">
-          <div className="mx-auto max-w-[1480px] px-6 md:px-12 py-24 md:py-32 flex flex-col md:flex-row gap-10 md:items-end md:justify-between">
-            <Reveal>
-              <div className="eyebrow opacity-70">05 — Bring us in</div>
-              <h2 className="mt-4 font-display font-semibold text-[40px] md:text-[64px] lg:text-[80px] leading-[0.95] tracking-[-0.035em] max-w-[20ch]">
-                Tell us who's in the room<span className="text-dawn">.</span>
+        <section className="relative overflow-hidden bg-indigo text-dawn">
+          <div className="absolute inset-0 dot-field opacity-30 pointer-events-none" aria-hidden />
+          <div className="relative mx-auto max-w-[1480px] px-6 md:px-12 py-24 md:py-32">
+            <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12 md:mb-16">
+              <h2 className="font-display font-semibold text-[36px] md:text-[56px] lg:text-[64px] leading-[0.95] tracking-[-0.03em] max-w-[20ch]">
+                Industries we work with<span className="text-stoep">.</span>
               </h2>
-              <p className="mt-6 text-[15px] md:text-[17px] leading-[1.65] max-w-[52ch] opacity-85">
-                A short note about the team, the date, and the question you want
-                answered. We'll reply within a working day with a shape for the
-                session and a quote.
-              </p>
+              <div className="eyebrow opacity-65">04 — Industries</div>
             </Reveal>
-            <Reveal delay={0.15} className="flex gap-3 flex-wrap">
-              <Link href="/about#contact" data-cursor className="inline-flex items-center gap-2 px-6 py-3.5 bg-indigo text-dawn rounded-full text-[14px] font-medium hover:bg-indigo-deep transition-colors duration-300">
-                Get in touch →
-              </Link>
-              <Link href="/case-studies" data-cursor className="inline-flex items-center gap-2 px-6 py-3.5 border border-indigo text-indigo rounded-full text-[14px] font-medium hover:bg-indigo hover:text-dawn transition-colors duration-300">
-                See where we've been
-              </Link>
-            </Reveal>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {industries.map((ind, i) => (
+                <Reveal
+                  key={ind.name}
+                  delay={i * 0.08}
+                  as="article"
+                  className="group relative bg-dawn/5 border border-dawn/10 p-8 md:p-10 rounded-[8px] hover:bg-dawn/10 transition-colors duration-500 overflow-hidden"
+                >
+                  <span className="absolute top-0 left-8 right-8 h-[1.5px] bg-stoep scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
+                  <h3 className="font-display font-semibold text-[24px] md:text-[28px] tracking-[-0.02em] leading-[1.1]">
+                    {ind.name}<span className="text-stoep">.</span>
+                  </h3>
+                  <ul className="mt-6 space-y-3">
+                    {ind.tasks.map((task) => (
+                      <li key={task} className="flex items-start gap-3 text-[14.5px] leading-[1.6] opacity-80">
+                        <span className="mt-[5px] shrink-0 w-[6px] h-[6px] rounded-full bg-stoep" />
+                        {task}
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </section>
       </main>
