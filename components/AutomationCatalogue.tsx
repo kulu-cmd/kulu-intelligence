@@ -2,18 +2,21 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
-type Category =
-  | "All"
+// ─── Data ──────────────────────────────────────────────────────────────────
+
+type AutomationCategory =
   | "Documents"
   | "Communications"
   | "Sales pipeline"
   | "Data & admin"
-  | "HR & hiring";
+  | "HR & hiring"
+  | "Knowledge";
 
 interface AutomationItem {
   id: string;
-  category: Exclude<Category, "All">;
+  category: AutomationCategory;
   name: string;
   description: string;
   timeSaved: string;
@@ -21,531 +24,334 @@ interface AutomationItem {
 
 const ALL_ITEMS: AutomationItem[] = [
   // Documents
-  {
-    id: "d1",
-    category: "Documents",
-    name: "Proposal generator",
-    description:
-      "Sales call notes or a brief → complete branded proposal with scope, deliverables, and timeline. Zero manual drafting.",
-    timeSaved: "2–3 hrs per proposal",
-  },
-  {
-    id: "d2",
-    category: "Documents",
-    name: "Contract & SLA builder",
-    description:
-      "Client data → fully populated contract with correct entity names, figures, and dates — gaps highlighted automatically.",
-    timeSaved: "3–5 hrs per contract",
-  },
-  {
-    id: "d3",
-    category: "Documents",
-    name: "Quote & pricing sheet",
-    description:
-      "Line items and margins in → formatted, on-brand quote document out. Handles currency, escalation, and totals.",
-    timeSaved: "1–2 hrs per quote",
-  },
-  {
-    id: "d4",
-    category: "Documents",
-    name: "Report generator",
-    description:
-      "Raw data → formatted weekly or monthly client-facing report, ready to send.",
-    timeSaved: "2–3 hrs per week",
-  },
-  {
-    id: "d5",
-    category: "Documents",
-    name: "Meeting notes to action items",
-    description:
-      "Rough notes or transcript → structured summary with decisions, owners, and deadlines extracted.",
-    timeSaved: "45 min per meeting",
-  },
+  { id: "d1", category: "Documents", name: "Proposal generator", description: "Sales call notes → complete branded proposal with scope, deliverables, and timeline. Zero manual drafting.", timeSaved: "2–3 hrs / proposal" },
+  { id: "d2", category: "Documents", name: "Contract & SLA builder", description: "Client data → fully populated contract with correct entity names, figures, and dates — gaps highlighted automatically.", timeSaved: "3–5 hrs / contract" },
+  { id: "d3", category: "Documents", name: "Quote & pricing sheet", description: "Line items and margins → formatted, on-brand quote document. Handles currency, escalation, and totals.", timeSaved: "1–2 hrs / quote" },
+  { id: "d4", category: "Documents", name: "Report generator", description: "Raw data → formatted weekly or monthly client-facing report, ready to send.", timeSaved: "2–3 hrs / week" },
+  { id: "d5", category: "Documents", name: "Meeting notes to actions", description: "Rough notes or transcript → structured summary with decisions, owners, and deadlines extracted.", timeSaved: "45 min / meeting" },
   // Communications
-  {
-    id: "c1",
-    category: "Communications",
-    name: "Email triage & response drafter",
-    description:
-      "Incoming emails classified by type → AI drafts responses for routine messages. Human approves and sends.",
-    timeSaved: "1–2 hrs per day",
-  },
-  {
-    id: "c2",
-    category: "Communications",
-    name: "Follow-up sequence builder",
-    description:
-      "Post-meeting or post-proposal → personalised follow-up emails at set intervals. No lead goes cold.",
-    timeSaved: "3–4 hrs per week",
-  },
-  {
-    id: "c3",
-    category: "Communications",
-    name: "Client onboarding pack",
-    description:
-      "New client details → welcome letter, terms summary, account setup instructions, and first-week checklist.",
-    timeSaved: "45 min per client",
-  },
-  {
-    id: "c4",
-    category: "Communications",
-    name: "Review response drafter",
-    description:
-      "New Google or Hellopeter review detected → personalised on-brand response drafted for approval.",
-    timeSaved: "4–5 hrs per week",
-  },
-  {
-    id: "c5",
-    category: "Communications",
-    name: "Internal newsletter",
-    description:
-      "Weekly inputs from team → formatted internal communication or client newsletter, ready to send.",
-    timeSaved: "2 hrs per week",
-  },
+  { id: "c1", category: "Communications", name: "Email triage & drafter", description: "Incoming emails classified by type → AI drafts responses for routine messages. Human approves and sends.", timeSaved: "1–2 hrs / day" },
+  { id: "c2", category: "Communications", name: "Follow-up sequence builder", description: "Post-meeting or post-proposal → personalised follow-up emails at set intervals. No lead goes cold.", timeSaved: "3–4 hrs / week" },
+  { id: "c3", category: "Communications", name: "Client onboarding pack", description: "New client details → welcome letter, terms summary, account setup, and first-week checklist.", timeSaved: "45 min / client" },
+  { id: "c4", category: "Communications", name: "Review response drafter", description: "New Google or Hellopeter review → personalised on-brand response drafted for approval.", timeSaved: "4–5 hrs / week" },
+  { id: "c5", category: "Communications", name: "Internal newsletter", description: "Weekly inputs from team → formatted internal communication or client newsletter, ready to send.", timeSaved: "2 hrs / week" },
   // Sales pipeline
-  {
-    id: "s1",
-    category: "Sales pipeline",
-    name: "Lead intake processor",
-    description:
-      "Inbound enquiry → enriched lead profile with pain points, company context, and recommended solution angle.",
-    timeSaved: "30 min per lead",
-  },
-  {
-    id: "s2",
-    category: "Sales pipeline",
-    name: "CRM auto-population",
-    description:
-      "Sales call or email thread → CRM fields updated automatically. No more manual note entry after every call.",
-    timeSaved: "20 min per call",
-  },
-  {
-    id: "s3",
-    category: "Sales pipeline",
-    name: "Competitive intel digest",
-    description:
-      "Competitors monitored weekly → summary of pricing, product, and messaging changes.",
-    timeSaved: "3 hrs per week",
-  },
-  {
-    id: "s4",
-    category: "Sales pipeline",
-    name: "Renewal alert & draft letter",
-    description:
-      "Contract end date approaching → automated alert plus draft renewal letter with updated pricing pre-filled.",
-    timeSaved: "1 hr per renewal",
-  },
+  { id: "s1", category: "Sales pipeline", name: "Lead intake processor", description: "Inbound enquiry → enriched lead profile with pain points, company context, and recommended solution angle.", timeSaved: "30 min / lead" },
+  { id: "s2", category: "Sales pipeline", name: "CRM auto-population", description: "Sales call or email thread → CRM fields updated automatically. No more manual note entry after every call.", timeSaved: "20 min / call" },
+  { id: "s3", category: "Sales pipeline", name: "Competitive intel digest", description: "Competitors monitored weekly → summary of pricing, product, and messaging changes.", timeSaved: "3 hrs / week" },
+  { id: "s4", category: "Sales pipeline", name: "Renewal alert & draft letter", description: "Contract end date approaching → automated alert plus draft renewal letter with pricing pre-filled.", timeSaved: "1 hr / renewal" },
   // Data & admin
-  {
-    id: "a1",
-    category: "Data & admin",
-    name: "Invoice & PO processor",
-    description:
-      "Incoming invoice or purchase order → data extracted and logged into accounting system automatically.",
-    timeSaved: "1–2 hrs per day",
-  },
-  {
-    id: "a2",
-    category: "Data & admin",
-    name: "KPI dashboard compiler",
-    description:
-      "Multiple data sources → single formatted management report with key metrics, trends, and flags.",
-    timeSaved: "90 min per week",
-  },
-  {
-    id: "a3",
-    category: "Data & admin",
-    name: "Receipt & expense categoriser",
-    description:
-      "Photo of receipt or bank statement → categorised expense entry ready for accountant.",
-    timeSaved: "2–3 hrs per week",
-  },
-  {
-    id: "a4",
-    category: "Data & admin",
-    name: "Document summariser",
-    description:
-      "Long reports, contracts, or RFPs → concise executive summary with key points and required actions.",
-    timeSaved: "1–2 hrs per document",
-  },
+  { id: "a1", category: "Data & admin", name: "Invoice & PO processor", description: "Incoming invoice or purchase order → data extracted and logged into accounting system automatically.", timeSaved: "1–2 hrs / day" },
+  { id: "a2", category: "Data & admin", name: "KPI dashboard compiler", description: "Multiple data sources → single formatted management report with key metrics, trends, and flags.", timeSaved: "90 min / week" },
+  { id: "a3", category: "Data & admin", name: "Receipt & expense categoriser", description: "Photo of receipt or bank statement → categorised expense entry ready for accountant.", timeSaved: "2–3 hrs / week" },
+  { id: "a4", category: "Data & admin", name: "Document summariser", description: "Long reports, contracts, or RFPs → concise executive summary with key points and required actions.", timeSaved: "1–2 hrs / doc" },
   // HR & hiring
-  {
-    id: "h1",
-    category: "HR & hiring",
-    name: "CV screener & shortlist",
-    description:
-      "Bulk CV upload → ranked shortlist with match score, red flags, and suggested interview questions.",
-    timeSaved: "1 hr per 10 CVs",
-  },
-  {
-    id: "h2",
-    category: "HR & hiring",
-    name: "Job description writer",
-    description:
-      "Role brief → complete JD with responsibilities, requirements, and tone aligned to company culture.",
-    timeSaved: "1–2 hrs per JD",
-  },
-  {
-    id: "h3",
-    category: "HR & hiring",
-    name: "Employee onboarding doc pack",
-    description:
-      "New hire details → full onboarding pack: employment summary, IT checklist, policies, first-week schedule.",
-    timeSaved: "2 hrs per hire",
-  },
-  {
-    id: "h4",
-    category: "HR & hiring",
-    name: "Interview summary report",
-    description:
-      "Interview notes or transcript → structured candidate evaluation with strengths, concerns, and hire recommendation.",
-    timeSaved: "30 min per interview",
-  },
+  { id: "h1", category: "HR & hiring", name: "CV screener & shortlist", description: "Bulk CV upload → ranked shortlist with match score, red flags, and suggested interview questions.", timeSaved: "1 hr / 10 CVs" },
+  { id: "h2", category: "HR & hiring", name: "Job description writer", description: "Role brief → complete JD with responsibilities, requirements, and tone aligned to company culture.", timeSaved: "1–2 hrs / JD" },
+  { id: "h3", category: "HR & hiring", name: "Employee onboarding pack", description: "New hire details → full onboarding pack: employment summary, IT checklist, policies, first-week schedule.", timeSaved: "2 hrs / hire" },
+  { id: "h4", category: "HR & hiring", name: "Interview summary report", description: "Interview notes or transcript → structured candidate evaluation with strengths, concerns, and hire recommendation.", timeSaved: "30 min / interview" },
+  // Knowledge
+  { id: "k1", category: "Knowledge", name: "Internal Q&A assistant", description: "Your policies and procedures → a smart assistant that answers staff questions instantly, around the clock.", timeSaved: "2–4 hrs / week" },
+  { id: "k2", category: "Knowledge", name: "Client knowledge portal", description: "Your FAQs and product docs → a searchable self-service portal that reduces inbound support queries.", timeSaved: "5–8 hrs / week" },
+  { id: "k3", category: "Knowledge", name: "Training doc generator", description: "Process notes and SOPs → formatted training manuals ready for new hires on day one.", timeSaved: "3–5 hrs / manual" },
+  { id: "k4", category: "Knowledge", name: "Policy digest builder", description: "Dense policy documents → plain-English summaries with searchable key clauses your team can actually use.", timeSaved: "2 hrs / document" },
 ];
 
-const CATEGORIES: Category[] = [
-  "All",
-  "Documents",
-  "Communications",
-  "Sales pipeline",
-  "Data & admin",
-  "HR & hiring",
+// ─── Topic tiles ───────────────────────────────────────────────────────────
+
+interface Topic {
+  id: string;
+  label: string;
+  descriptor: string;
+  category: AutomationCategory;
+  selectedBg: string;    // bg-* token
+  selectedText: string;  // text-* token
+}
+
+const TOPICS: Topic[] = [
+  { id: "docs",  label: "Admin & Paperwork",   descriptor: "Proposals · Contracts · Quotes",   category: "Documents",      selectedBg: "bg-mielie",  selectedText: "text-indigo" },
+  { id: "comms", label: "Communications",       descriptor: "Emails · Follow-ups · Onboarding", category: "Communications", selectedBg: "bg-spruit",  selectedText: "text-indigo" },
+  { id: "data",  label: "Reports & Data",       descriptor: "KPIs · Expenses · Dashboards",     category: "Data & admin",   selectedBg: "bg-indigo",  selectedText: "text-dawn"   },
+  { id: "sales", label: "Sales Pipeline",       descriptor: "Leads · CRM · Renewals",           category: "Sales pipeline", selectedBg: "bg-stoep",   selectedText: "text-indigo" },
+  { id: "hr",    label: "Hiring & HR",          descriptor: "CVs · Job ads · Onboarding",       category: "HR & hiring",    selectedBg: "bg-mielie",  selectedText: "text-indigo" },
+  { id: "kb",    label: "Knowledge Bases",      descriptor: "Q&A bots · Training · Portals",    category: "Knowledge",      selectedBg: "bg-spruit",  selectedText: "text-indigo" },
 ];
 
-const ITEMS_PER_PAGE = 4;
+// ─── Topic tile ────────────────────────────────────────────────────────────
 
-const pageVariants = {
-  enter: { opacity: 0, y: 18 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
-};
-
-function globalNum(item: AutomationItem): string {
-  return String(ALL_ITEMS.findIndex((i) => i.id === item.id) + 1).padStart(2, "0");
-}
-
-/* ─── Main component ──────────────────────────────────────────────── */
-
-export function AutomationCatalogue() {
-  const [active, setActive] = useState<Category>("All");
-  const [page, setPage] = useState(0);
-
-  const filtered = useMemo(
-    () =>
-      active === "All"
-        ? ALL_ITEMS
-        : ALL_ITEMS.filter((i) => i.category === active),
-    [active]
-  );
-
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-  const pageItems = filtered.slice(
-    page * ITEMS_PER_PAGE,
-    (page + 1) * ITEMS_PER_PAGE
-  );
-  const [featured, ...rest] = pageItems;
-
-  function navigate(newPage: number) {
-    setPage(newPage);
-  }
-
-  function changeCategory(cat: Category) {
-    setActive(cat);
-    setPage(0);
-  }
-
-  return (
-    <section id="catalogue" className="py-24 md:py-32 bg-dawn overflow-hidden">
-      <div className="mx-auto max-w-[1480px] px-6 md:px-12">
-
-        {/* Section header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10 md:mb-14">
-          <h2 className="font-display font-semibold text-[36px] md:text-[56px] lg:text-[64px] leading-[0.95] tracking-[-0.03em]">
-            What we can build for you
-            <span className="text-stoep">.</span>
-          </h2>
-          <div className="eyebrow opacity-55">Automation catalogue</div>
-        </div>
-
-        {/* Category filter */}
-        <div className="relative flex items-center overflow-x-auto no-scrollbar border-b border-indigo/10 mb-10">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => changeCategory(cat)}
-              className={[
-                "relative flex-shrink-0 px-4 md:px-5 py-3 eyebrow transition-colors duration-200 whitespace-nowrap",
-                active === cat
-                  ? "text-indigo"
-                  : "text-indigo/35 hover:text-indigo/65",
-              ].join(" ")}
-            >
-              {cat}
-              {active === cat && (
-                <motion.div
-                  layoutId="filter-bar"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-stoep"
-                  style={{ borderRadius: "2px 2px 0 0" }}
-                  transition={{ type: "spring", damping: 34, stiffness: 440 }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Catalogue viewport */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${active}-${page}`}
-            variants={pageVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {/* Featured card */}
-            {featured && (
-              <FeaturedCard item={featured} num={globalNum(featured)} />
-            )}
-
-            {/* Supporting cards */}
-            {rest.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                {rest.map((item, i) => (
-                  <SmallCard
-                    key={item.id}
-                    item={item}
-                    num={globalNum(item)}
-                    idx={i}
-                  />
-                ))}
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between mt-10 pt-8 border-t border-indigo/10">
-          <span className="eyebrow tabular-nums">
-            <span className="text-indigo font-semibold opacity-100">
-              {String(page + 1).padStart(2, "0")}
-            </span>
-            <span className="opacity-30"> / {String(totalPages).padStart(2, "0")}</span>
-            <span className="opacity-25 ml-3 hidden md:inline">
-              · {filtered.length} automation{filtered.length !== 1 ? "s" : ""}
-            </span>
-          </span>
-
-          <div className="flex items-center gap-4">
-            {/* Progress pips */}
-            <div className="hidden md:flex items-center gap-2">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => navigate(i)}
-                  aria-label={`Page ${i + 1}`}
-                  className="transition-all duration-300 rounded-full"
-                  style={{
-                    width: i === page ? 22 : 6,
-                    height: 6,
-                    backgroundColor:
-                      i === page
-                        ? "#FF6B5C"
-                        : "rgba(26,43,71,0.18)",
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Prev / Next */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => navigate(page - 1)}
-                disabled={page === 0}
-                aria-label="Previous page"
-                className="w-11 h-11 rounded-full border border-indigo/15 flex items-center justify-center text-indigo text-[18px] font-display transition-all duration-200 hover:border-indigo/40 hover:bg-indigo/5 disabled:opacity-20 disabled:cursor-not-allowed"
-              >
-                ←
-              </button>
-              <button
-                onClick={() => navigate(page + 1)}
-                disabled={page >= totalPages - 1}
-                aria-label="Next page"
-                className="w-11 h-11 rounded-full border border-indigo/15 flex items-center justify-center text-indigo text-[18px] font-display transition-all duration-200 hover:border-indigo/40 hover:bg-indigo/5 disabled:opacity-20 disabled:cursor-not-allowed"
-              >
-                →
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─── Featured card (full-width, dark) ───────────────────────────── */
-
-function FeaturedCard({
-  item,
-  num,
+function TopicTile({
+  topic,
+  isSelected,
+  onToggle,
+  index,
 }: {
-  item: AutomationItem;
-  num: string;
+  topic: Topic;
+  isSelected: boolean;
+  onToggle: () => void;
+  index: number;
 }) {
-  const [hovered, setHovered] = useState(false);
-
   return (
-    <article
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="relative overflow-hidden rounded-[10px] bg-indigo text-dawn p-8 md:p-14 min-h-[260px] md:min-h-[310px] flex flex-col justify-between cursor-default"
+    <motion.button
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.96 }}
+      onClick={onToggle}
+      className={[
+        "relative overflow-hidden rounded-[14px] p-6 md:p-8 text-left cursor-pointer",
+        "min-h-[120px] md:min-h-[148px] flex flex-col justify-between group",
+        "transition-colors duration-300",
+        isSelected
+          ? `${topic.selectedBg} ${topic.selectedText}`
+          : "bg-dawn border border-indigo/12 text-indigo hover:border-indigo/30 hover:bg-indigo/[0.018]",
+      ].join(" ")}
     >
-      {/* Dot texture */}
-      <div
-        className="absolute inset-0 dot-field opacity-[0.32] pointer-events-none"
-        aria-hidden
-      />
+      {/* Hover accent bar (unselected only) */}
+      {!isSelected && (
+        <span className="absolute top-0 left-0 h-[2px] bg-stoep w-0 group-hover:w-full transition-all duration-500 ease-out" aria-hidden />
+      )}
 
-      {/* Ghost catalogue number */}
-      <div
-        aria-hidden
-        className="absolute right-4 -bottom-6 font-display font-semibold leading-none tracking-[-0.06em] select-none pointer-events-none"
-        style={{
-          fontSize: "clamp(160px, 20vw, 260px)",
-          color: "rgba(255,248,232,0.05)",
-        }}
-      >
-        {num}
+      {/* Top row: checkmark */}
+      <div className="flex justify-end h-5">
+        <AnimatePresence>
+          {isSelected && (
+            <motion.span
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 22 }}
+              className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold"
+              style={{ background: "rgba(0,0,0,0.18)" }}
+              aria-hidden
+            >
+              ✓
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Top row */}
-      <div className="relative flex items-center justify-between">
-        <span className="eyebrow opacity-45">{item.category}</span>
-        <div className="flex items-center gap-2">
-          <span
-            className="block w-1.5 h-1.5 rounded-full bg-stoep flex-shrink-0"
-            style={{ opacity: 0.7 }}
-            aria-hidden
-          />
-          <span className="eyebrow opacity-38 text-[9.5px]">
-            {item.timeSaved} saved
-          </span>
+      {/* Label */}
+      <div>
+        <div className="font-display font-semibold text-[17px] sm:text-[20px] md:text-[22px] lg:text-[24px] tracking-[-0.02em] leading-[1.1]">
+          {topic.label}
+        </div>
+        <div className={`eyebrow mt-2 ${isSelected ? "opacity-55" : "opacity-38"}`}>
+          {topic.descriptor}
         </div>
       </div>
-
-      {/* Body */}
-      <div className="relative mt-auto">
-        <h3 className="font-display font-semibold text-[32px] md:text-[44px] lg:text-[52px] tracking-[-0.025em] leading-[0.97] mb-5 max-w-[24ch]">
-          {item.name}
-          <span className="text-stoep">.</span>
-        </h3>
-
-        <div className="flex flex-col md:flex-row md:items-end gap-5 md:gap-10">
-          <p className="text-[14px] md:text-[15px] leading-[1.65] opacity-60 max-w-[56ch]">
-            {item.description}
-          </p>
-          <a
-            href="/about#contact"
-            style={{
-              opacity: hovered ? 1 : 0.72,
-              transform: hovered ? "translateX(0)" : "translateX(-4px)",
-              transition: "opacity 0.22s ease, transform 0.22s ease",
-            }}
-            className="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-stoep text-indigo rounded-full text-[12px] font-medium whitespace-nowrap self-start md:self-auto"
-          >
-            Talk to us about this →
-          </a>
-        </div>
-      </div>
-
-      {/* Hover accent bar */}
-      <div
-        className="absolute top-0 left-0 h-[3px] bg-stoep"
-        style={{
-          width: hovered ? "100%" : "0%",
-          transition: "width 0.6s cubic-bezier(0.22,1,0.36,1)",
-        }}
-      />
-    </article>
+    </motion.button>
   );
 }
 
-/* ─── Small card (3-up grid) ──────────────────────────────────────── */
+// ─── Result card ───────────────────────────────────────────────────────────
 
-function SmallCard({
-  item,
-  num,
-  idx,
-}: {
-  item: AutomationItem;
-  num: string;
-  idx: number;
-}) {
-  const [hovered, setHovered] = useState(false);
-
+function ResultCard({ item, index }: { item: AutomationItem; index: number }) {
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.42,
-        delay: 0.08 + idx * 0.07,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="relative overflow-hidden rounded-[10px] border border-indigo/[0.09] bg-dawn p-6 md:p-8 flex flex-col cursor-default"
-      style={{
-        transform: hovered ? "translateY(-3px)" : "translateY(0)",
-        boxShadow: hovered
-          ? "0 14px 44px rgba(26,43,71,0.10), 0 2px 6px rgba(26,43,71,0.05)"
-          : "0 1px 3px rgba(26,43,71,0.04)",
-        transition:
-          "transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease",
-      }}
+      layout
+      initial={{ opacity: 0, y: 22, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.45, delay: index * 0.045, ease: [0.22, 1, 0.36, 1] }}
+      className="group relative overflow-hidden rounded-[12px] bg-dawn border border-indigo/10
+                 p-7 md:p-9 flex flex-col
+                 hover:border-indigo/22 hover:shadow-[0_14px_44px_rgba(26,43,71,0.08)]
+                 transition-all duration-300"
     >
       {/* Accent bar */}
-      <div
-        className="absolute top-0 left-0 h-[2px] bg-stoep"
-        style={{
-          width: hovered ? "100%" : "0%",
-          transition: "width 0.5s cubic-bezier(0.22,1,0.36,1)",
-        }}
+      <span
+        className="absolute top-0 left-0 h-[2px] bg-stoep w-0 group-hover:w-full transition-all duration-500 ease-out"
+        aria-hidden
       />
 
-      {/* Number + category */}
-      <div className="flex items-center justify-between mb-5">
-        <span
-          className="font-display font-semibold text-[11px] tracking-[-0.01em]"
-          style={{ opacity: 0.18 }}
-        >
-          {num}
-        </span>
-        <span className="eyebrow opacity-32 text-[9px]">{item.category}</span>
+      {/* Category + time saved */}
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <span className="eyebrow opacity-38">{item.category}</span>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <span className="block w-1.5 h-1.5 rounded-full bg-stoep opacity-60 flex-shrink-0" aria-hidden />
+          <span className="eyebrow opacity-40">{item.timeSaved} saved</span>
+        </div>
       </div>
 
       {/* Name */}
-      <h3 className="font-display font-medium text-[22px] md:text-[26px] tracking-[-0.02em] leading-[1.1] flex-1">
+      <h3 className="font-display font-semibold text-[20px] md:text-[24px] lg:text-[28px] tracking-[-0.02em] leading-[1.1] flex-1">
         {item.name}
         <span className="text-stoep">.</span>
       </h3>
 
-      {/* Description — 2-line clamp */}
-      <p className="mt-3 text-[13px] leading-[1.62] opacity-52 line-clamp-2">
+      {/* Description */}
+      <p className="mt-4 text-[13.5px] md:text-[14px] leading-[1.65] opacity-62">
         {item.description}
       </p>
 
-      {/* Time saved */}
-      <div className="mt-5 pt-4 border-t border-indigo/[0.08] flex items-center gap-2">
-        <span
-          className="block w-1.5 h-1.5 rounded-full bg-stoep flex-shrink-0"
-          style={{ opacity: 0.55 }}
-          aria-hidden
-        />
-        <span className="eyebrow opacity-38 text-[9.5px]">
-          {item.timeSaved} saved
-        </span>
+      {/* CTA */}
+      <div className="mt-6 pt-5 border-t border-indigo/[0.08]">
+        <Link
+          href="/about#contact"
+          className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stoep
+                     hover:gap-3 transition-all duration-200"
+        >
+          Build this for me →
+        </Link>
       </div>
     </motion.article>
+  );
+}
+
+// ─── Main component ────────────────────────────────────────────────────────
+
+export function AutomationCatalogue() {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const filteredItems = useMemo(() => {
+    if (selected.size === 0) return [];
+    const cats = new Set(
+      TOPICS.filter((t) => selected.has(t.id)).map((t) => t.category)
+    );
+    return ALL_ITEMS.filter((item) => cats.has(item.category));
+  }, [selected]);
+
+  const noneSelected = selected.size === 0;
+
+  return (
+    <section className="py-24 md:py-32 bg-dawn overflow-hidden">
+      <div className="mx-auto max-w-[1480px] px-6 md:px-12">
+
+        {/* ── Heading ─────────────────────────────────────── */}
+        <div className="mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="eyebrow opacity-50 mb-5"
+          >
+            What can we build for you
+          </motion.div>
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ y: "105%" }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.85, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
+                         text-[44px] sm:text-[64px] md:text-[80px] lg:text-[96px]"
+            >
+              Automate something<span className="text-stoep">.</span>
+            </motion.h2>
+          </div>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-6 text-[15px] md:text-[17px] opacity-55 leading-[1.65] max-w-[46ch]"
+          >
+            Pick what's slowing your team down. We'll show you exactly what's possible.
+          </motion.p>
+        </div>
+
+        {/* ── Topic tiles ─────────────────────────────────── */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {TOPICS.map((topic, i) => (
+            <TopicTile
+              key={topic.id}
+              topic={topic}
+              isSelected={selected.has(topic.id)}
+              onToggle={() => toggle(topic.id)}
+              index={i}
+            />
+          ))}
+        </div>
+
+        {/* ── Empty state hint ────────────────────────────── */}
+        <AnimatePresence>
+          {noneSelected && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+              className="mt-16 flex items-center justify-center gap-3"
+            >
+              <div className="h-px flex-1 bg-indigo/8" />
+              <span className="eyebrow opacity-25">select a category above to see what's possible</span>
+              <div className="h-px flex-1 bg-indigo/8" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Results ─────────────────────────────────────── */}
+        <AnimatePresence mode="wait">
+          {filteredItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-16 md:mt-20"
+            >
+              {/* Count header */}
+              <div className="flex items-end justify-between mb-8 md:mb-10 pb-6 border-b border-indigo/10">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={filteredItems.length}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="font-display font-semibold text-[20px] md:text-[28px] lg:text-[34px] tracking-[-0.025em] leading-[1]"
+                  >
+                    {filteredItems.length} automation{filteredItems.length !== 1 ? "s" : ""} we can build for you
+                    <span className="text-stoep">.</span>
+                  </motion.div>
+                </AnimatePresence>
+                <span className="eyebrow opacity-35 hidden md:block">
+                  {selected.size} topic{selected.size !== 1 ? "s" : ""} selected
+                </span>
+              </div>
+
+              {/* Cards grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <AnimatePresence mode="popLayout">
+                  {filteredItems.map((item, i) => (
+                    <ResultCard key={item.id} item={item} index={i} />
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {/* Bottom CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="mt-12 md:mt-16 pt-10 border-t border-indigo/10
+                           flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+              >
+                <p className="text-[14px] md:text-[15px] opacity-55 max-w-[44ch] leading-[1.65]">
+                  Not seeing exactly what you need? We build bespoke.
+                  Tell us the problem — we'll figure out the solution.
+                </p>
+                <Link
+                  href="/about#contact"
+                  className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3.5
+                             bg-stoep text-indigo rounded-full text-[14px] font-medium
+                             hover:bg-[#ff5747] transition-colors duration-300"
+                >
+                  Talk to us →
+                </Link>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </div>
+    </section>
   );
 }
