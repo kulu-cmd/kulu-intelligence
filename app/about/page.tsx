@@ -6,6 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { CustomCursor } from "@/components/CustomCursor";
 import { PageEnter } from "@/components/PageEnter";
 import { AboutDiscovery } from "@/components/AboutDiscovery";
+import { Magnetic } from "@/components/Magnetic";
 
 export default function AboutPage() {
   return (
@@ -72,22 +73,26 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="flex gap-3 flex-wrap">
-                <Link
-                  href="/learn"
-                  data-cursor
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-stoep text-indigo
-                             rounded-full text-[14px] font-medium hover:bg-[#ff5747] transition-colors duration-300"
-                >
-                  Book a seminar →
-                </Link>
-                <Link
-                  href="/implement"
-                  data-cursor
-                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-dawn/30
-                             text-dawn rounded-full text-[14px] font-medium hover:bg-dawn/10 transition-colors duration-300"
-                >
-                  Automate something
-                </Link>
+                <Magnetic strength={0.3}>
+                  <Link
+                    href="/learn"
+                    data-cursor
+                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-stoep text-indigo
+                               rounded-full text-[14px] font-medium hover:bg-[#ff5747] transition-colors duration-300"
+                  >
+                    Book a seminar →
+                  </Link>
+                </Magnetic>
+                <Magnetic strength={0.3}>
+                  <Link
+                    href="/implement"
+                    data-cursor
+                    className="inline-flex items-center gap-2 px-6 py-3.5 border border-dawn/30
+                               text-dawn rounded-full text-[14px] font-medium hover:bg-dawn/10 transition-colors duration-300"
+                  >
+                    Automate something
+                  </Link>
+                </Magnetic>
               </div>
             </Reveal>
 

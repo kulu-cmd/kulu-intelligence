@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
+import { Magnetic } from "./Magnetic";
 
 // ─── Client data ────────────────────────────────────────────────────────────
 
@@ -40,57 +41,21 @@ const CLIENTS: Client[] = [
     surface: "indigo",
   },
   {
-    name: "Meridian HR",
-    industry: "HR & Recruitment",
-    location: "Cape Town",
+    name: "Element Farm Solutions",
+    industry: "Business Solutions",
+    location: "South Africa",
     brief:
-      "A mid-size recruitment firm drowning in CV screening and candidate summaries. We built a screening pipeline that cut their shortlisting time by 70%.",
+      "One source of truth for the business, a sales pipeline that tracks every deal to close, and a digital marketing engine that runs without daily oversight — built and live within a month.",
     testimonial:
-      "We were sceptical at first — AI in recruitment gets a bad rap. But Kulu's approach was practical, not gimmicky. Our recruiters now spend their time talking to candidates, not reading through stacks of CVs.",
-    testimonialAuthor: "Nadia Petersen",
-    testimonialRole: "Operations Lead, Meridian HR",
+      "The knowledge base changed how we onboard and how we answer client questions. The sales pipeline means no lead gets dropped or forgotten. And the marketing runs itself — we're consistent and visible without someone staring at a dashboard all day. Three problems, three clean solutions.",
+    testimonialAuthor: "Kamil Baloyi",
+    testimonialRole: "Director, Element Farm Solutions",
     services: [
-      "CV Screening Automation",
-      "Candidate Summary Generation",
-      "AI Integration in Practice Seminar",
+      "Knowledge Base Build",
+      "Sales Pipeline Automation",
+      "Digital Marketing Automation",
     ],
     surface: "mielie",
-  },
-  {
-    name: "Blackwood & Associates",
-    industry: "Accounting & Advisory",
-    location: "Durban",
-    brief:
-      "A growing accounting firm needed to standardise client communications and speed up their monthly reporting cycle without adding headcount.",
-    testimonial:
-      "What impressed us most was how quickly Kulu delivered. We had the first automation live within two weeks, and the team adopted it without any resistance. It just worked the way we already worked.",
-    testimonialAuthor: "David Blackwood",
-    testimonialRole: "Partner, Blackwood & Associates",
-    services: [
-      "Client Communication Templates",
-      "Monthly Report Automation",
-      "Internal Knowledge Base",
-      "Claude for Business Seminar",
-    ],
-    surface: "spruit",
-  },
-  {
-    name: "Urban Edge Properties",
-    industry: "Property Management",
-    location: "Pretoria",
-    brief:
-      "Managing 200+ residential units with a lean team. We automated tenant communications, maintenance scheduling, and lease renewals.",
-    testimonial:
-      "Our admin load dropped almost overnight. Tenants get faster responses, maintenance requests route themselves, and lease renewals practically handle themselves. Kulu gave us our weekends back.",
-    testimonialAuthor: "Thabo Mokoena",
-    testimonialRole: "Director, Urban Edge Properties",
-    services: [
-      "Tenant Communication Automation",
-      "Maintenance Request Pipeline",
-      "Lease Renewal Automation",
-      "AI Integration in Practice Seminar",
-    ],
-    surface: "dawn",
   },
 ];
 
@@ -304,6 +269,83 @@ function ClientCard({ client, index }: { client: Client; index: number }) {
   );
 }
 
+// ─── CTA panel with mouse-tracked highlight ─────────────────────────────────
+
+function CtaPanel() {
+  const ref = useRef<HTMLDivElement>(null);
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+  const smx = useSpring(mx, { damping: 28, stiffness: 80 });
+  const smy = useSpring(my, { damping: 28, stiffness: 80 });
+  const spotX = useTransform(smx, (v) => `${v * 100}%`);
+  const spotY = useTransform(smy, (v) => `${v * 100}%`);
+
+  const onMove = (e: React.MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width);
+    my.set((e.clientY - r.top) / r.height);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mt-12 md:mt-24 bg-stoep text-indigo rounded-[12px] px-6 sm:px-8 md:px-14 py-10 md:py-20
+                 flex flex-col md:flex-row gap-8 md:items-end md:justify-between overflow-hidden"
+    >
+      {/* Mouse-tracked highlight */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(420px circle at var(--mx) var(--my), rgba(255,255,255,0.18), transparent 65%)",
+          ["--mx" as string]: spotX,
+          ["--my" as string]: spotY,
+        }}
+      />
+
+      <div className="relative">
+        <div className="eyebrow opacity-65 mb-4">Your turn</div>
+        <h2 className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
+                       text-[28px] sm:text-[36px] md:text-[48px] lg:text-[64px] max-w-[20ch]">
+          What could we automate for you<span className="text-dawn">?</span>
+        </h2>
+      </div>
+      <div className="relative flex gap-3 flex-wrap">
+        <Magnetic strength={0.28}>
+          <motion.div whileTap={{ scale: 0.96 }}>
+            <Link
+              href="/implement"
+              className="inline-flex items-center gap-2 px-6 py-4 bg-indigo text-dawn
+                         rounded-full text-[14px] font-medium hover:bg-[#13203A] transition-colors duration-300"
+            >
+              See what&apos;s possible →
+            </Link>
+          </motion.div>
+        </Magnetic>
+        <Magnetic strength={0.28}>
+          <motion.div whileTap={{ scale: 0.96 }}>
+            <Link
+              href="/about#contact"
+              className="inline-flex items-center gap-2 px-6 py-3.5 border border-indigo/30
+                         text-indigo rounded-full text-[14px] font-medium py-4 hover:bg-indigo/10 transition-colors duration-300"
+            >
+              Talk to us
+            </Link>
+          </motion.div>
+        </Magnetic>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Main component ─────────────────────────────────────────────────────────
 
 export function ClientCards() {
@@ -317,38 +359,7 @@ export function ClientCards() {
         </div>
 
         {/* ── CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-16 md:mt-24 bg-stoep text-indigo rounded-[12px] px-8 md:px-14 py-14 md:py-20
-                     flex flex-col md:flex-row gap-8 md:items-end md:justify-between"
-        >
-          <div>
-            <div className="eyebrow opacity-65 mb-4">Your turn</div>
-            <h2 className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
-                           text-[32px] md:text-[48px] lg:text-[64px] max-w-[20ch]">
-              What could we automate for you<span className="text-dawn">?</span>
-            </h2>
-          </div>
-          <div className="flex gap-3 flex-wrap">
-            <Link
-              href="/implement"
-              className="inline-flex items-center gap-2 px-6 py-3.5 bg-indigo text-dawn
-                         rounded-full text-[14px] font-medium hover:bg-[#13203A] transition-colors duration-300"
-            >
-              See what&apos;s possible →
-            </Link>
-            <Link
-              href="/about#contact"
-              className="inline-flex items-center gap-2 px-6 py-3.5 border border-indigo/30
-                         text-indigo rounded-full text-[14px] font-medium hover:bg-indigo/10 transition-colors duration-300"
-            >
-              Talk to us
-            </Link>
-          </div>
-        </motion.div>
+        <CtaPanel />
       </div>
     </section>
   );

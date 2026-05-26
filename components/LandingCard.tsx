@@ -358,6 +358,7 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
         duration: 0.7,
         ease: [0.22, 1, 0.36, 1],
       }}
+      whileTap={{ scale: 0.985 }}
       style={{ perspective: 1200 }}
       className="relative min-h-0"
     >
@@ -410,13 +411,13 @@ function TileCell({ tile, idx }: { tile: Tile; idx: number }) {
           {/* Title + body — transparent overlay at bottom of image */}
           <motion.div
             style={{ x: tx, y: ty, transformStyle: "preserve-3d" }}
-            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center gap-2 px-5 pb-5 sm:px-7 sm:pb-6 md:px-8 md:pb-7"
+            className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center justify-end text-center px-5 pb-5 sm:px-7 sm:pb-6 md:px-8 md:pb-7"
           >
             <h3 className="font-display font-semibold leading-[0.95] tracking-[-0.025em] text-[clamp(26px,3vw,44px)]">
               {tile.title}
               <span className={`period ${periodColour[tile.surface]}`}>.</span>
             </h3>
-            <p className="text-[12px] md:text-[13px] lg:text-[14px] leading-[1.5] max-w-[26ch] opacity-80">
+            <p className="mt-2 text-[12px] md:text-[13px] lg:text-[14px] leading-[1.5] max-w-[26ch] min-h-[3.5em] opacity-80">
               {tile.body}
             </p>
           </motion.div>

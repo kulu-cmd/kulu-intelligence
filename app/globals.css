@@ -210,3 +210,48 @@ html.motion-ready .tile {
 /* Hide scrollbar utility — used by the industries strip on small screens */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ────────────────────────────────────────────
+   Hover underline — grows left→right on focus/hover
+   Usage: add .link-underline to any inline element
+   ──────────────────────────────────────────── */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-stoep);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ────────────────────────────────────────────
+   Count-up pop — subtle scale flash when a big
+   number finishes counting in
+   ──────────────────────────────────────────── */
+@keyframes count-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.count-pop {
+  animation: count-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ────────────────────────────────────────────
+   Magnetic button base — smooth return spring
+   is handled by Framer Motion in Magnetic.tsx
+   ──────────────────────────────────────────── */
+.btn-magnetic {
+  will-change: transform;
+}

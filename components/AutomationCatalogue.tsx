@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { Magnetic } from "./Magnetic";
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
@@ -205,10 +206,8 @@ export function AutomationCatalogue() {
 
   function toggle(id: string) {
     setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+      if (prev.has(id)) return new Set();
+      return new Set([id]);
     });
   }
 
@@ -228,33 +227,78 @@ export function AutomationCatalogue() {
 
         {/* ── Heading ─────────────────────────────────────── */}
         <div className="mb-12 md:mb-16">
+          <h2
+            aria-label="Automate something."
+            className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
+                       text-[44px] sm:text-[64px] md:text-[80px] lg:text-[96px]"
+          >
+            {["Automate", "something"].map((word, i) => (
+              <span key={word} className="inline-block overflow-hidden mr-[0.22em] pb-[0.18em] mb-[-0.18em]">
+                <motion.span
+                  className="inline-block"
+                  initial={{ y: "110%", opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.85, delay: 0.08 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {word}
+                </motion.span>
+              </span>
+            ))}
+            <span className="inline-block overflow-hidden">
+              <motion.span
+                className="inline-block text-stoep"
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ delay: 0.42, type: "spring", stiffness: 320, damping: 14 }}
+                aria-hidden
+              >
+                .
+              </motion.span>
+            </span>
+          </h2>
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="eyebrow opacity-50 mb-5"
-          >
-            What can we build for you
-          </motion.div>
-          <div className="overflow-hidden">
-            <motion.h2
-              initial={{ y: "105%" }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.85, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
-                         text-[44px] sm:text-[64px] md:text-[80px] lg:text-[96px]"
-            >
-              Automate something<span className="text-stoep">.</span>
-            </motion.h2>
-          </div>
-          <motion.p
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 text-[15px] md:text-[17px] opacity-55 leading-[1.65] max-w-[46ch]"
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10 flex flex-col items-center gap-4"
           >
-            Pick what's slowing your team down. We'll show you exactly what's possible.
-          </motion.p>
+            {/* Rule + headline row */}
+            <div className="flex items-center gap-4 w-full max-w-[560px]">
+              <span className="flex-1 h-px bg-indigo opacity-[0.14] shrink-0 min-w-[20px]" />
+              <p
+                className="font-display font-medium tracking-[-0.025em] text-indigo text-center text-[18px] sm:text-[20px] md:text-[24px]"
+              >
+                Point at the{" "}
+                <span className="relative inline-block">
+                  <span className="relative z-10 text-stoep">culprit</span>
+                  <motion.span
+                    className="absolute left-0 bottom-[2px] h-[2px] bg-stoep rounded-full"
+                    initial={{ width: 0 }}
+                    whileInView={{ width: "100%" }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.55, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                    aria-hidden
+                  />
+                </span>
+                <span className="text-stoep">.</span>
+              </p>
+              <span className="flex-1 h-px bg-indigo opacity-[0.14]" />
+            </div>
+
+            {/* Bouncing arrow */}
+            <motion.svg
+              width="14" height="22" viewBox="0 0 14 22" fill="none"
+              className="text-stoep"
+              animate={{ y: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+              aria-hidden
+            >
+              <path d="M7 0v18M1 12l6 6 6-6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </motion.svg>
+          </motion.div>
         </div>
 
         {/* ── Topic tiles ─────────────────────────────────── */}
@@ -313,7 +357,7 @@ export function AutomationCatalogue() {
                   </motion.div>
                 </AnimatePresence>
                 <span className="eyebrow opacity-35 hidden md:block">
-                  {selected.size} topic{selected.size !== 1 ? "s" : ""} selected
+                  {TOPICS.find((t) => selected.has(t.id))?.label ?? ""}
                 </span>
               </div>
 
@@ -338,14 +382,18 @@ export function AutomationCatalogue() {
                   Not seeing exactly what you need? We build bespoke.
                   Tell us the problem — we'll figure out the solution.
                 </p>
-                <Link
-                  href="/about#contact"
-                  className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3.5
-                             bg-stoep text-indigo rounded-full text-[14px] font-medium
-                             hover:bg-[#ff5747] transition-colors duration-300"
-                >
-                  Talk to us →
-                </Link>
+                <Magnetic strength={0.3}>
+                  <motion.div whileTap={{ scale: 0.96 }}>
+                    <Link
+                      href="/about#contact"
+                      className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3.5
+                                 bg-stoep text-indigo rounded-full text-[14px] font-medium
+                                 hover:bg-[#ff5747] transition-colors duration-300"
+                    >
+                      Talk to us →
+                    </Link>
+                  </motion.div>
+                </Magnetic>
               </motion.div>
             </motion.div>
           )}

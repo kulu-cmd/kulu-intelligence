@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 
 // ─── Chapter data ──────────────────────────────────────────────────────────
 
@@ -90,6 +90,17 @@ function StoryContent() {
 }
 
 function NumbersContent() {
+  const countRef = useRef<HTMLSpanElement>(null);
+  const inView = useInView(countRef, { once: true, margin: "-60px" });
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => Math.round(v).toString());
+
+  useEffect(() => {
+    if (inView) {
+      animate(count, 90, { duration: 1.8, ease: [0.22, 1, 0.36, 1] });
+    }
+  }, [inView, count]);
+
   return (
     <div className="pb-12">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
@@ -99,12 +110,13 @@ function NumbersContent() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="md:col-span-6 flex items-start"
         >
-          <span
+          <motion.span
+            ref={countRef}
             className="font-display font-semibold tracking-[-0.05em] leading-[0.85] text-indigo"
             style={{ fontSize: "clamp(80px,14vw,160px)" }}
           >
-            90
-          </span>
+            {rounded}
+          </motion.span>
           <span
             className="font-display font-semibold text-stoep tracking-[-0.03em] leading-[1]"
             style={{ fontSize: "clamp(40px,7vw,80px)", marginTop: "0.1em" }}

@@ -1,16 +1,32 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 /**
- * CaseStudiesHero — editorial opening for the case studies page.
- * Two-line typographic composition: the first line ghosts back,
- * the second steps forward. The coral period is the only accent.
+ * CaseStudiesHero — editorial two-line composition.
+ * "Hear from" ghosts back, "our clients." steps forward.
+ * Both layers parallax at different rates as you scroll, creating depth.
  */
 export function CaseStudiesHero() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Background text (dim) drifts up slowly — feels distant
+  const hearFromY = useTransform(scrollYProgress, [0, 1], [0, -25]);
+  // Foreground text (full) drifts up faster — feels close
+  const ourClientsY = useTransform(scrollYProgress, [0, 1], [0, -65]);
+
   return (
-    <section className="relative bg-dawn text-indigo overflow-hidden pt-36 md:pt-48 pb-16 md:pb-24">
-      {/* Whisper of stoep warmth — top right, barely there */}
+    <section
+      ref={sectionRef}
+      className="relative bg-dawn text-indigo overflow-hidden pt-28 md:pt-52 pb-12 md:pb-24"
+    >
+      {/* Atmosphere blob */}
       <motion.div
         aria-hidden
         className="absolute -top-1/4 right-0 w-[55vw] h-[55vw] rounded-full blur-[160px] pointer-events-none"
@@ -23,31 +39,14 @@ export function CaseStudiesHero() {
       />
 
       <div className="relative mx-auto max-w-[1480px] px-6 md:px-12">
-
-        {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center gap-3 mb-14 md:mb-20"
-        >
-          <motion.span
-            className="block w-1.5 h-1.5 rounded-full bg-stoep flex-shrink-0"
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-            aria-hidden
-          />
-          <span className="eyebrow opacity-65">Practice — Client work</span>
-        </motion.div>
-
-        {/* Headline */}
         <h1 aria-label="Hear from our clients.">
 
-          {/* Line 1: "Hear from" — recedes into the background */}
+          {/* Line 1: dim, moves slowly → background layer */}
           <div className="overflow-hidden">
             <motion.span
+              style={{ y: hearFromY, willChange: "transform" }}
               className="block font-display font-semibold leading-[0.92] tracking-[-0.04em]
-                         text-[52px] sm:text-[80px] md:text-[112px] lg:text-[144px]
+                         text-[38px] sm:text-[64px] md:text-[112px] lg:text-[144px]
                          opacity-[0.18]"
               initial={{ y: "110%" }}
               animate={{ y: 0 }}
@@ -57,11 +56,12 @@ export function CaseStudiesHero() {
             </motion.span>
           </div>
 
-          {/* Line 2: "our clients." — steps forward, coral period punctuates */}
+          {/* Line 2: full opacity, moves faster → foreground layer */}
           <div className="overflow-hidden">
             <motion.span
+              style={{ y: ourClientsY, willChange: "transform" }}
               className="block font-display font-semibold leading-[0.92] tracking-[-0.04em]
-                         text-[52px] sm:text-[80px] md:text-[112px] lg:text-[144px]"
+                         text-[38px] sm:text-[64px] md:text-[112px] lg:text-[144px]"
               initial={{ y: "110%" }}
               animate={{ y: 0 }}
               transition={{ duration: 0.9, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
@@ -86,7 +86,7 @@ export function CaseStudiesHero() {
 
         </h1>
 
-        {/* Hairline rule — the quiet full stop at the section base */}
+        {/* Hairline rule */}
         <motion.div
           className="mt-14 md:mt-20 h-px bg-indigo/12"
           initial={{ scaleX: 0 }}
