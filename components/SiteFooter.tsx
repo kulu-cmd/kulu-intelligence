@@ -1,16 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { KuluWordmark } from "./KuluWordmark";
 import { Magnetic } from "./Magnetic";
-
-const nav = [
-  { href: "/learn",        label: "Learn" },
-  { href: "/implement",    label: "Implement" },
-  { href: "/case-studies", label: "Practice" },
-  { href: "/about",        label: "Approach" },
-];
 
 const easeKulu: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -86,42 +78,10 @@ export function SiteFooter() {
           </ul>
         </motion.div>
 
-        {/* Site nav */}
-        <motion.div
-          className="md:col-span-3"
-          custom={2}
-          variants={colVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-        >
-          <div className="eyebrow opacity-65 mb-4">The site</div>
-          <ul className="text-[14px] leading-[1.85] flex flex-col gap-2">
-            {nav.map((item, i) => (
-              <motion.li
-                key={item.href}
-                initial={{ opacity: 0, x: -8 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: 0.25 + i * 0.06, ease: easeKulu }}
-              >
-                <Link
-                  href={item.href}
-                  data-cursor
-                  className="relative inline-block group"
-                >
-                  <span className="hover:text-stoep transition-colors duration-300">{item.label}</span>
-                  <span className="absolute bottom-0 left-0 h-[1px] bg-stoep w-0 group-hover:w-full transition-all duration-350 ease-out" />
-                </Link>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
-
         {/* Based in */}
         <motion.div
           className="md:col-span-2"
-          custom={3}
+          custom={2}
           variants={colVariants}
           initial="hidden"
           whileInView="visible"

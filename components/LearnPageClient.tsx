@@ -1,18 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import Link from "next/link";
+import { LearnOpeningQuote } from "./LearnOpeningQuote";
+import { Magnetic } from "./Magnetic";
+import IndustrySelector from "./IndustrySelector";
+
+const easeKulu: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-
-interface Industry {
-  id: string;
-  name: string;
-  tagline: string;
-  selectedBgLight: string;
-  selectedTextLight: string;
-  agenda: string[];
-}
 
 interface Room {
   eyebrow: string;
@@ -20,112 +17,33 @@ interface Room {
   body: string;
   baseBg: string;
   accentDot: string;
+  periodColor: string;
 }
-
-const INDUSTRIES: Industry[] = [
-  {
-    id: "property",
-    name: "Property",
-    tagline: "Managing agents & estate agencies",
-    selectedBgLight: "bg-indigo",
-    selectedTextLight: "text-dawn",
-    agenda: [
-      "What AI is doing in property right now — and what it isn't",
-      "Drafting lease summaries, inspection reports, and tenant queries",
-      "Automating listing descriptions from agent notes",
-      "Screening tenant applications against your criteria",
-      "Where your client data lives and how to handle it properly",
-      "Prompting properly: getting consistent output from your team",
-      "Two or three tools worth trialling this quarter",
-    ],
-  },
-  {
-    id: "marketing",
-    name: "Marketing",
-    tagline: "Agencies & in-house teams",
-    selectedBgLight: "bg-stoep",
-    selectedTextLight: "text-indigo",
-    agenda: [
-      "What AI can actually do for creative and strategy work",
-      "Brief-to-first-draft workflows that don't sound like AI wrote them",
-      "Repurposing content across channels without losing the voice",
-      "Using AI for campaign data analysis and surfacing real insight",
-      "Protecting your clients' brand voice in AI-assisted processes",
-      "How to evaluate a new AI tool without falling for the hype",
-      "The two or three tools worth your team's time this quarter",
-    ],
-  },
-  {
-    id: "accounting",
-    name: "Accounting",
-    tagline: "Practices & finance teams",
-    selectedBgLight: "bg-mielie",
-    selectedTextLight: "text-indigo",
-    agenda: [
-      "Where AI fits in financial workflows — and where it doesn't belong",
-      "Reconciling and flagging anomalies faster without losing oversight",
-      "Drafting management account commentary from the numbers",
-      "Summarising complex documents for partners and clients",
-      "Data security: what can cross the firewall and what can't",
-      "Building reliable, auditable AI workflows your partners can trust",
-      "The compliance questions you should be asking now",
-    ],
-  },
-  {
-    id: "hr",
-    name: "HR Agencies",
-    tagline: "Recruiters & people teams",
-    selectedBgLight: "bg-spruit",
-    selectedTextLight: "text-indigo",
-    agenda: [
-      "The honest state of AI in recruitment — what's hype, what's live",
-      "Screening CVs against role criteria at speed and scale",
-      "Drafting job briefs and interview frameworks from an intake call",
-      "Summarising candidate notes and building shortlist rationale",
-      "Keeping human judgment where it matters in assessment",
-      "How to use AI without introducing bias into your process",
-      "Tools worth evaluating — and the ones to skip",
-    ],
-  },
-  {
-    id: "mining",
-    name: "Mining",
-    tagline: "Consultancies & operations",
-    selectedBgLight: "bg-mielie",
-    selectedTextLight: "text-indigo",
-    agenda: [
-      "AI in heavy industry: what's practical today, what's years away",
-      "Automating proposal and tender document generation",
-      "Building knowledge bases for operational teams and new hires",
-      "Streamlining reporting across disconnected systems",
-      "Safety and compliance considerations when deploying AI",
-      "Getting field teams and office staff onto the same tools",
-      "Where to start — and what to measure first",
-    ],
-  },
-];
 
 const ROOMS: Room[] = [
   {
-    eyebrow: "For partners and principals",
-    title: "Leadership sessions",
-    body: "A grounded read on where AI is, what it can do for a firm like yours, and the decisions that need to happen first. No buzzwords — just a clear picture.",
-    baseBg: "bg-stoep",
-    accentDot: "bg-dawn",
+    eyebrow:     "For directors and C-suite",
+    title:       "Leadership sessions",
+    body:        "A strategic read on AI for the people making the calls. What it means for your firm, your competition, and the decisions you need to make this year. Clear picture, no buzzwords.",
+    baseBg:      "bg-stoep",
+    accentDot:   "bg-dawn",
+    periodColor: "text-dawn",
   },
   {
-    eyebrow: "For functional teams",
-    title: "Working sessions",
-    body: "Hands-on with the tools, on your own work. Whatever the team actually spends its time on — we work through it together in the room.",
-    baseBg: "bg-mielie",
-    accentDot: "bg-stoep",
+    eyebrow:     "Sales, Ops, Admin, Dev & HR teams",
+    title:       "Business Stakeholders",
+    body:        "How your team gets the best out of AI — whatever their role. Practical, hands-on, and built around the actual work your people do every day.",
+    baseBg:      "bg-mielie",
+    accentDot:   "bg-stoep",
+    periodColor: "text-stoep",
   },
   {
-    eyebrow: "For everyone in the room",
-    title: "Firm-wide briefings",
-    body: "A shared frame of reference. So the conversation about AI stops being seven different conversations happening in parallel across the firm.",
-    baseBg: "bg-spruit",
-    accentDot: "bg-indigo",
+    eyebrow:     "For educators and administrators",
+    title:       "Schools and Institutions",
+    body:        "Preparing teachers, students, and staff for an AI-native world. Practical guidance, responsible use, and a shared vocabulary the whole institution can work from.",
+    baseBg:      "bg-spruit",
+    accentDot:   "bg-indigo",
+    periodColor: "text-stoep",
   },
 ];
 
@@ -137,85 +55,7 @@ const FORMAT_STATS = [
 
 const TITLE_WORDS = ["Rough", "and", "Tumble", "with", "AI"];
 
-const easeKulu: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-interface TileProps {
-  industry: Industry;
-  isSelected: boolean;
-  index: number;
-  onClick: () => void;
-}
-
-function IndustryTile({ industry, isSelected, index, onClick }: TileProps) {
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      className={[
-        "relative flex flex-col justify-between rounded-[12px] p-5 text-left transition-colors duration-200 min-h-[100px] w-full",
-        isSelected
-          ? `${industry.selectedBgLight} ${industry.selectedTextLight}`
-          : "bg-indigo/5 border border-indigo/15 text-indigo hover:bg-indigo/10 hover:border-indigo/25",
-      ].join(" ")}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ delay: 0.2 + index * 0.07, duration: 0.5, ease: easeKulu }}
-      whileTap={{ scale: 0.97 }}
-    >
-      <AnimatePresence>
-        {isSelected && (
-          <motion.span
-            key="check"
-            className="absolute top-3 right-3 flex items-center justify-center w-6 h-6 rounded-full bg-indigo/15 text-indigo text-xs font-bold"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 420, damping: 22 }}
-          >
-            ✓
-          </motion.span>
-        )}
-      </AnimatePresence>
-      <div>
-        <p className="eyebrow mb-2 opacity-50">{industry.tagline}</p>
-        <span
-          className="font-display font-medium leading-tight"
-          style={{ fontSize: "clamp(17px, 1.3vw, 22px)" }}
-        >
-          {industry.name}
-        </span>
-      </div>
-    </motion.button>
-  );
-}
-
-function AgendaList({ items, industryId }: { items: string[]; industryId: string }) {
-  return (
-    <ol className="list-none m-0 p-0">
-      {items.map((item, index) => (
-        <motion.li
-          key={`${industryId}-${index}`}
-          className="flex items-start border-b border-dawn/12 py-4 gap-4 overflow-hidden"
-          initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
-          animate={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}
-          transition={{ delay: 0.04 + index * 0.06, duration: 0.65, ease: easeKulu }}
-        >
-          <span className="eyebrow text-dawn/40 shrink-0 pt-px" style={{ width: "40px" }}>
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span className="font-body text-dawn/85 leading-relaxed" style={{ fontSize: "15px" }}>
-            {item}
-          </span>
-        </motion.li>
-      ))}
-    </ol>
-  );
-}
-
-// ─── Audience card (own section) ──────────────────────────────────────────────
+// ─── Audience card ────────────────────────────────────────────────────────────
 
 function AudienceCard({ room, index }: { room: Room; index: number }) {
   return (
@@ -226,30 +66,25 @@ function AudienceCard({ room, index }: { room: Room; index: number }) {
       transition={{ duration: 0.7, delay: index * 0.1, ease: easeKulu }}
       whileHover={{ y: -6, transition: { duration: 0.35, ease: easeKulu } }}
       className={[
-        "relative overflow-hidden rounded-[14px] p-6 md:p-10 flex flex-col min-h-[220px] md:min-h-[260px] cursor-default text-indigo",
+        "relative overflow-hidden rounded-[14px] p-7 md:p-10 flex flex-col",
+        "min-h-[240px] md:min-h-[280px] cursor-default text-indigo",
         room.baseBg,
       ].join(" ")}
     >
-      {/* Dot field texture */}
-      <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.12]" aria-hidden />
-
-      {/* Accent dot top-right */}
+      <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.10]" aria-hidden />
       <span
-        className={`absolute top-6 right-6 w-3 h-3 rounded-full ${room.accentDot} opacity-70`}
+        className={`absolute top-6 right-6 w-2.5 h-2.5 rounded-full ${room.accentDot} opacity-55`}
         aria-hidden
       />
-
-      {/* Content */}
       <div className="relative mt-auto">
-        <p className="eyebrow mb-4 opacity-50">{room.eyebrow}</p>
+        <p className="eyebrow mb-5 opacity-40">{room.eyebrow}</p>
         <h3
-          className="font-display font-semibold leading-[1.05] tracking-[-0.025em] mb-4 text-indigo"
+          className="font-display font-semibold leading-[1.05] tracking-[-0.025em] mb-4"
           style={{ fontSize: "clamp(22px, 2vw, 30px)" }}
         >
-          {room.title}
-          <span className="text-indigo/40">.</span>
+          {room.title}<span className={room.periodColor}>.</span>
         </h3>
-        <p className="leading-[1.7] text-indigo/60" style={{ fontSize: "14px" }}>
+        <p className="leading-[1.72] opacity-55" style={{ fontSize: "14px" }}>
           {room.body}
         </p>
       </div>
@@ -260,7 +95,6 @@ function AudienceCard({ room, index }: { room: Room; index: number }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function LearnPageClient() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const heroRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -268,151 +102,84 @@ export default function LearnPageClient() {
     offset: ["start start", "end start"],
   });
   const titleY = useTransform(scrollYProgress, [0, 1], [0, -55]);
-  const tilesY = useTransform(scrollYProgress, [0, 1], [0, -25]);
-
-  const selectedIndustry = INDUSTRIES.find((i) => i.id === selectedId) ?? null;
-
-  function handleTileClick(id: string) {
-    setSelectedId((prev) => (prev === id ? null : id));
-  }
 
   return (
     <>
-      {/* ── Hero ── */}
-      <section ref={heroRef} className="relative bg-dawn text-indigo overflow-hidden pt-32 md:pt-44">
-        {/* Atmosphere blobs */}
+      <LearnOpeningQuote />
+
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <section ref={heroRef} className="relative bg-dawn text-indigo overflow-hidden pt-28 md:pt-40">
+
         <motion.div
           aria-hidden
-          className="absolute -top-[20%] -right-[10%] w-[55vw] h-[55vw] rounded-full blur-[120px] opacity-[0.28] pointer-events-none"
+          className="absolute -top-[20%] -right-[10%] w-[55vw] h-[55vw] rounded-full blur-[120px] opacity-[0.22] pointer-events-none"
           style={{ background: "radial-gradient(circle, #FF6B5C 0%, transparent 70%)" }}
           animate={{ x: [0, 30, -20, 0], y: [0, -20, 30, 0] }}
           transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           aria-hidden
-          className="absolute -bottom-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full blur-[120px] opacity-[0.18] pointer-events-none"
+          className="absolute -bottom-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full blur-[120px] opacity-[0.14] pointer-events-none"
           style={{ background: "radial-gradient(circle, #B8E0D2 0%, transparent 70%)" }}
           animate={{ x: [0, -30, 20, 0], y: [0, 20, -30, 0] }}
           transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Title + tiles */}
         <div className="relative mx-auto max-w-[1480px] px-6 md:px-12">
           <motion.h1
             aria-label="Rough and Tumble with AI"
             style={{ y: titleY, willChange: "transform" }}
-            className="font-display font-semibold leading-[0.92] tracking-[-0.04em] text-[44px] sm:text-[64px] md:text-[96px] lg:text-[120px] max-w-[16ch]"
+            className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
+                       text-[44px] sm:text-[64px] md:text-[96px] lg:text-[120px] max-w-[16ch]"
           >
             {TITLE_WORDS.map((w, i) => (
-              <motion.span
-                key={i}
-                className="inline-block mr-[0.25em]"
-                initial={{ y: "100%", opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.9, delay: 0.15 + i * 0.07, ease: easeKulu }}
-              >
-                {w}
-                {i === TITLE_WORDS.length - 1 && (
-                  <motion.span
-                    className="inline-block text-stoep"
-                    initial={{ scale: 0, y: -20, opacity: 0 }}
-                    animate={{ scale: 1, y: 0, opacity: 1 }}
-                    transition={{
-                      delay: 0.15 + TITLE_WORDS.length * 0.07 + 0.05,
-                      type: "spring",
-                      stiffness: 320,
-                      damping: 14,
-                    }}
-                    aria-hidden
-                  >
-                    .
-                  </motion.span>
-                )}
-              </motion.span>
+              <span key={i} className="inline-block overflow-hidden mr-[0.25em] pb-[0.12em] mb-[-0.12em]">
+                <motion.span
+                  className="inline-block"
+                  initial={{ y: "105%", opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.9, delay: 0.08 + i * 0.08, ease: easeKulu }}
+                >
+                  {w}
+                  {i === TITLE_WORDS.length - 1 && (
+                    <motion.span
+                      className="inline-block text-stoep"
+                      initial={{ scale: 0, y: -20, opacity: 0 }}
+                      whileInView={{ scale: 1, y: 0, opacity: 1 }}
+                      viewport={{ once: true, margin: "-60px" }}
+                      transition={{
+                        delay: 0.08 + TITLE_WORDS.length * 0.08 + 0.05,
+                        type: "spring",
+                        stiffness: 320,
+                        damping: 14,
+                      }}
+                      aria-hidden
+                    >
+                      .
+                    </motion.span>
+                  )}
+                </motion.span>
+              </span>
             ))}
           </motion.h1>
 
-          {/* Industry tiles */}
-          <motion.div
-            style={{ y: tilesY, willChange: "transform" }}
-            className="mt-12 md:mt-16"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65, duration: 0.8, ease: easeKulu }}
-          >
-            <p className="eyebrow opacity-55 mb-5">Pick your industry to see a tailored agenda</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-              {INDUSTRIES.map((industry, index) => (
-                <IndustryTile
-                  key={industry.id}
-                  industry={industry}
-                  isSelected={selectedId === industry.id}
-                  index={index}
-                  onClick={() => handleTileClick(industry.id)}
-                />
-              ))}
-            </div>
-          </motion.div>
+          <IndustrySelector />
         </div>
 
-        {/* ── Agenda — pops in between tiles and the format strip ── */}
-        <AnimatePresence>
-          {selectedIndustry && (
-            <motion.div
-              key="agenda"
-              style={{ overflow: "hidden" }}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.52, ease: easeKulu }}
-            >
-              <div className="relative bg-indigo text-dawn mt-10">
-                <div className="absolute inset-0 dot-field opacity-30 pointer-events-none" aria-hidden />
-                <div className="relative mx-auto max-w-[1480px] px-6 md:px-12 py-12 md:py-16">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={selectedIndustry.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.25, ease: easeKulu }}
-                    >
-                      {/* Industry label + agenda */}
-                      <div className="flex flex-col md:flex-row md:items-baseline gap-4 md:gap-10 mb-8">
-                        <h2
-                          className="font-display font-semibold text-dawn leading-tight"
-                          style={{ fontSize: "clamp(24px, 2.4vw, 40px)" }}
-                        >
-                          {selectedIndustry.name}
-                          <span className="text-stoep">.</span>
-                        </h2>
-                        <p className="eyebrow text-dawn/45">{selectedIndustry.tagline}</p>
-                      </div>
-                      <AgendaList
-                        items={selectedIndustry.agenda}
-                        industryId={selectedIndustry.id}
-                      />
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Format strip — always at the bottom of the hero ── */}
-        <div className="relative mt-10 border-t border-indigo/10">
+        {/* Format strip */}
+        <div className="relative mt-12 md:mt-16 border-t border-indigo/10">
           <div className="mx-auto max-w-[1480px] px-6 md:px-12 grid grid-cols-3 divide-x divide-indigo/10">
-            {FORMAT_STATS.map((item) => (
+            {FORMAT_STATS.map((item, i) => (
               <motion.div
                 key={item.label}
                 className="py-8 md:py-10 px-0 md:px-8 first:pl-0 last:pr-0"
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.6, ease: easeKulu }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: easeKulu }}
               >
-                <div className="eyebrow opacity-55">{item.label}</div>
+                <div className="eyebrow opacity-45">{item.label}</div>
                 <div className="mt-3 font-display font-medium text-[22px] sm:text-[28px] md:text-[38px] tracking-[-0.025em] leading-[1]">
                   {item.value}<span className="text-stoep">.</span>
                 </div>
@@ -422,12 +189,12 @@ export default function LearnPageClient() {
         </div>
       </section>
 
-      {/* ── Who is this for — 3 audience cards ── */}
-      <section className="bg-indigo text-dawn py-14 md:py-28 relative overflow-hidden">
-        {/* Background dot field */}
-        <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.18]" aria-hidden />
+      {/* ── Who is it for ─────────────────────────────────────────────────── */}
+      <section className="bg-indigo text-dawn py-20 md:py-32 relative overflow-hidden">
+        <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.15]" aria-hidden />
 
         <div className="mx-auto max-w-[1480px] px-6 md:px-12 relative">
+
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -436,17 +203,132 @@ export default function LearnPageClient() {
             className="mb-12 md:mb-16"
           >
             <h2
-              className="font-display font-semibold leading-[0.92] tracking-[-0.04em] text-dawn"
-              style={{ fontSize: "clamp(32px, 3.5vw, 56px)" }}
+              className="font-display font-semibold leading-[0.92] tracking-[-0.04em] text-dawn
+                         text-[36px] sm:text-[52px] md:text-[64px] lg:text-[72px]"
             >
               Who is it for<span className="text-stoep">?</span>
             </h2>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: 0.18, ease: easeKulu }}
+              className="mt-5 text-[15px] leading-[1.65] text-dawn/50 max-w-[46ch]"
+            >
+              The session adapts to the room. Same material, different angle — depending
+              on who is in the seats and what they are responsible for.
+            </motion.p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
             {ROOMS.map((room, index) => (
               <AudienceCard key={room.title} room={room} index={index} />
             ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      <section className="bg-stoep text-indigo py-14 md:py-20 relative overflow-hidden">
+        {/* Dot field atmosphere */}
+        <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.12]" aria-hidden />
+
+        {/* Drifting blob */}
+        <motion.div
+          aria-hidden
+          className="absolute -top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-[0.18] pointer-events-none"
+          style={{ background: "radial-gradient(circle, #FFF8E8 0%, transparent 70%)" }}
+          animate={{ x: [0, 20, -10, 0], y: [0, -15, 20, 0] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <div className="mx-auto max-w-[1480px] px-6 md:px-12 relative">
+          <div className="max-w-[860px]">
+
+            {/* Rule */}
+            <motion.div
+              className="h-[0.5px] bg-indigo/20 mb-8 md:mb-10"
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, ease: easeKulu }}
+              style={{ transformOrigin: "left" }}
+            />
+
+            <motion.p
+              className="eyebrow opacity-40 mb-6"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 0.4, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, ease: easeKulu }}
+            >
+              Open to all industries
+            </motion.p>
+
+            <motion.h2
+              className="font-display font-semibold leading-[0.95] tracking-[-0.035em] text-indigo
+                         text-[36px] sm:text-[52px] md:text-[64px] mb-5"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.75, delay: 0.08, ease: easeKulu }}
+            >
+              Your industry<span className="text-dawn">.</span>{" "}
+              <br className="hidden sm:block" />
+              Your team<span className="text-dawn">.</span>{" "}
+              <br className="hidden sm:block" />
+              Your pace<span className="text-dawn">.</span>
+            </motion.h2>
+
+            <motion.p
+              className="text-[15px] md:text-[16px] leading-[1.7] text-indigo/65 mb-8 max-w-[52ch]"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, delay: 0.18, ease: easeKulu }}
+            >
+              We are keen to teach people from all industries. If you would like to
+              collaborate with us to deliver a more curated workshop, get in touch —
+              we will shape the sessions around what your team actually needs.
+            </motion.p>
+
+            <motion.div
+              className="flex flex-wrap gap-3"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, delay: 0.28, ease: easeKulu }}
+            >
+              <Magnetic strength={0.3}>
+                <motion.div whileTap={{ scale: 0.96 }}>
+                  <Link
+                    href="/about#contact"
+                    className="inline-flex items-center gap-2 px-7 py-4
+                               bg-indigo text-dawn rounded-full text-[14px] font-medium
+                               hover:bg-indigo-deep transition-colors duration-300"
+                  >
+                    Book a session →
+                  </Link>
+                </motion.div>
+              </Magnetic>
+
+              <Magnetic strength={0.25}>
+                <motion.div whileTap={{ scale: 0.96 }}>
+                  <a
+                    href={`https://wa.me/27613889339?text=${encodeURIComponent("Hi! I'd like to collaborate with Kulu Intelligence on a curated workshop for our team.")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-7 py-4
+                               bg-dawn/25 text-indigo rounded-full text-[14px] font-medium
+                               border border-indigo/15 hover:bg-dawn/40 transition-colors duration-300"
+                  >
+                    WhatsApp us
+                  </a>
+                </motion.div>
+              </Magnetic>
+            </motion.div>
+
           </div>
         </div>
       </section>

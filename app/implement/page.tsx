@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CustomCursor } from "@/components/CustomCursor";
 import { PageEnter } from "@/components/PageEnter";
 import { AutomationCatalogue } from "@/components/AutomationCatalogue";
+import { CreativeCatalogue } from "@/components/CreativeCatalogue";
 
 export default function ImplementPage() {
   return (
@@ -13,7 +14,7 @@ export default function ImplementPage() {
 
       <main className="bg-dawn">
         <AutomationCatalogue />
-
+        <CreativeCatalogue />
       </main>
       <SiteFooter />
     </>

@@ -1,268 +1,533 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface Room {
-  eyebrow: string;
+interface Seminar {
+  id: string;
   title: string;
-  body: string;
+  foundation: boolean;
 }
 
 interface Industry {
   id: string;
   name: string;
   tagline: string;
-  selectedBg: string;
-  selectedText: string;
-  agenda: string[];
+  cardBg: string;
+  cardText: string;
+  pillBg: string;
+  pillText: string;
+  pillSelectedBg: string;
+  pillSelectedText: string;
+  periodColor: string;
+  seminars: Seminar[];
+  customFoundation?: Seminar[];
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
+
+const FOUNDATION_SEMINARS: Seminar[] = [
+  { id: "F1", title: "What AI is and how to prompt well", foundation: true },
+  { id: "F2", title: "Using AI in Business Context — working with documents and projects", foundation: true },
+];
 
 const INDUSTRIES: Industry[] = [
   {
     id: "property",
     name: "Property",
     tagline: "Managing agents & estate agencies",
-    selectedBg: "bg-dawn",
-    selectedText: "text-indigo",
-    agenda: [
-      "What AI is doing in property right now — and what it isn't",
-      "Drafting lease summaries, inspection reports, and tenant queries",
-      "Automating listing descriptions from agent notes",
-      "Screening tenant applications against your criteria",
-      "Where your client data lives and how to handle it properly",
-      "Prompting properly: getting consistent output from your team",
-      "Two or three tools worth trialling this quarter",
+    cardBg: "bg-stoep",
+    cardText: "text-indigo",
+    pillBg: "bg-stoep/15",
+    pillText: "text-indigo",
+    pillSelectedBg: "bg-indigo",
+    pillSelectedText: "text-dawn",
+    periodColor: "text-dawn",
+    seminars: [
+      { id: "P1", title: "What AI is doing in property right now", foundation: false },
+      { id: "P2", title: "From notes to listing copy: a prompting workshop", foundation: false },
+      { id: "P3", title: "Client communication at volume", foundation: false },
     ],
   },
   {
     id: "marketing",
     name: "Marketing",
     tagline: "Agencies & in-house teams",
-    selectedBg: "bg-stoep",
-    selectedText: "text-indigo",
-    agenda: [
-      "What AI can actually do for creative and strategy work",
-      "Brief-to-first-draft workflows that don't sound like AI wrote them",
-      "Repurposing content across channels without losing the voice",
-      "Using AI for campaign data analysis and surfacing real insight",
-      "Protecting your clients' brand voice in AI-assisted processes",
-      "How to evaluate a new AI tool without falling for the hype",
-      "The two or three tools worth your team's time this quarter",
+    cardBg: "bg-mielie",
+    cardText: "text-indigo",
+    pillBg: "bg-mielie/20",
+    pillText: "text-indigo",
+    pillSelectedBg: "bg-indigo",
+    pillSelectedText: "text-dawn",
+    periodColor: "text-stoep",
+    seminars: [
+      { id: "M1", title: "AI in the creative process", foundation: false },
+      { id: "M2", title: "Briefing and copy workshops", foundation: false },
+      { id: "M3", title: "Research and audience insight with AI", foundation: false },
     ],
   },
   {
     id: "accounting",
     name: "Accounting",
     tagline: "Practices & finance teams",
-    selectedBg: "bg-mielie",
-    selectedText: "text-indigo",
-    agenda: [
-      "Where AI fits in financial workflows — and where it doesn't belong",
-      "Reconciling and flagging anomalies faster without losing oversight",
-      "Drafting management account commentary from the numbers",
-      "Summarising complex documents for partners and clients",
-      "Data security: what can cross the firewall and what can't",
-      "Building reliable, auditable AI workflows your partners can trust",
-      "The compliance questions you should be asking now",
+    cardBg: "bg-spruit",
+    cardText: "text-indigo",
+    pillBg: "bg-spruit/20",
+    pillText: "text-indigo",
+    pillSelectedBg: "bg-indigo",
+    pillSelectedText: "text-dawn",
+    periodColor: "text-stoep",
+    seminars: [
+      { id: "A1", title: "AI in accounting today", foundation: false },
+      { id: "A2", title: "Querying financial documents with AI", foundation: false },
+      { id: "A3", title: "Writing clear client reports faster", foundation: false },
     ],
   },
   {
     id: "hr",
     name: "HR Agencies",
     tagline: "Recruiters & people teams",
-    selectedBg: "bg-spruit",
-    selectedText: "text-indigo",
-    agenda: [
-      "The honest state of AI in recruitment — what's hype, what's live",
-      "Screening CVs against role criteria at speed and scale",
-      "Drafting job briefs and interview frameworks from an intake call",
-      "Summarising candidate notes and building shortlist rationale",
-      "Keeping human judgment where it matters in assessment",
-      "How to use AI without introducing bias into your process",
-      "Tools worth evaluating — and the ones to skip",
+    cardBg: "bg-indigo",
+    cardText: "text-dawn",
+    pillBg: "bg-dawn/10",
+    pillText: "text-dawn",
+    pillSelectedBg: "bg-dawn",
+    pillSelectedText: "text-indigo",
+    periodColor: "text-stoep",
+    seminars: [
+      { id: "H1", title: "AI in talent acquisition", foundation: false },
+      { id: "H2", title: "Job descriptions and screening criteria", foundation: false },
+      { id: "H3", title: "Candidate communication at scale", foundation: false },
     ],
   },
   {
     id: "mining",
     name: "Mining",
     tagline: "Consultancies & operations",
-    selectedBg: "bg-mielie",
-    selectedText: "text-indigo",
-    agenda: [
-      "AI in heavy industry: what's practical today, what's years away",
-      "Automating proposal and tender document generation",
-      "Building knowledge bases for operational teams and new hires",
-      "Streamlining reporting across disconnected systems",
-      "Safety and compliance considerations when deploying AI",
-      "Getting field teams and office staff onto the same tools",
-      "Where to start — and what to measure first",
+    cardBg: "bg-mielie",
+    cardText: "text-indigo",
+    pillBg: "bg-mielie/20",
+    pillText: "text-indigo",
+    pillSelectedBg: "bg-indigo",
+    pillSelectedText: "text-dawn",
+    periodColor: "text-stoep",
+    seminars: [
+      { id: "X1", title: "AI in mining operations today", foundation: false },
+      { id: "X2", title: "Safety reporting and compliance with AI", foundation: false },
+      { id: "X3", title: "Geological data and AI-assisted analysis", foundation: false },
+    ],
+  },
+  {
+    id: "education",
+    name: "Education",
+    tagline: "Primary & secondary schools",
+    cardBg: "bg-indigo",
+    cardText: "text-dawn",
+    pillBg: "bg-indigo/10",
+    pillText: "text-indigo",
+    pillSelectedBg: "bg-spruit",
+    pillSelectedText: "text-indigo",
+    periodColor: "text-stoep",
+    customFoundation: [
+      { id: "EF1", title: "AI safety and best practices", foundation: true },
+      { id: "EF2", title: "How to prompt well", foundation: true },
+    ],
+    seminars: [
+      { id: "E1", title: "Using AI to build tools (Claude Code)", foundation: false },
+      { id: "E2", title: "AI for lesson planning and admin", foundation: false },
+      { id: "E3", title: "Teaching students to work alongside AI", foundation: false },
     ],
   },
 ];
 
-const ROOMS: Room[] = [
-  {
-    eyebrow: "For partners and principals",
-    title: "Leadership sessions",
-    body: "A grounded read on where AI is, what it can do for a firm like yours, and the decisions that need to happen first.",
-  },
-  {
-    eyebrow: "For functional teams",
-    title: "Working sessions",
-    body: "Hands-on with the tools, on your own work. Whatever the team actually spends its time on.",
-  },
-  {
-    eyebrow: "For everyone in the room",
-    title: "Firm-wide briefings",
-    body: "A shared frame of reference. So the conversation about AI stops being seven different conversations.",
-  },
-];
+const WA_NUMBER = "27613889339";
 
 // ─── Ease ─────────────────────────────────────────────────────────────────────
 
 const easeKulu: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-interface IndustryTileProps {
-  industry: Industry;
-  isSelected: boolean;
-  index: number;
-  onClick: () => void;
+function buildMessage(selected: Set<string>): string {
+  // Group selected IDs by industry
+  const byIndustry: Record<string, { ind: Industry; titles: string[] }> = {};
+  for (const id of selected) {
+    for (const ind of INDUSTRIES) {
+      const match = ind.seminars.find((s) => s.id === id);
+      if (match) {
+        if (!byIndustry[ind.id]) byIndustry[ind.id] = { ind, titles: [] };
+        byIndustry[ind.id].titles.push(match.title);
+      }
+    }
+  }
+
+  const lines: string[] = [
+    "Hi! I'd like to book a Kulu Intelligence seminar. Here's what I'm interested in:\n",
+  ];
+
+  // If only one industry selected, show that industry's foundation
+  const industryEntries = Object.values(byIndustry);
+  if (industryEntries.length === 1) {
+    const { ind, titles } = industryEntries[0];
+    const foundation = ind.customFoundation ?? FOUNDATION_SEMINARS;
+    lines.push("Foundation: " + foundation.map((s) => s.title).join(", "));
+    lines.push(`${ind.name}: ${titles.join(", ")}`);
+  } else {
+    // Multiple industries — show global foundation + per-industry breakdown
+    lines.push("Foundation: " + FOUNDATION_SEMINARS.map((s) => s.title).join(", "));
+    for (const { ind, titles } of industryEntries) {
+      lines.push(`${ind.name}: ${titles.join(", ")}`);
+    }
+  }
+
+  lines.push("\nCan we chat about putting this together?");
+  return lines.join("\n");
 }
 
-function IndustryTile({ industry, isSelected, index, onClick }: IndustryTileProps) {
+function buildEmailBody(selected: Set<string>): string {
+  return buildMessage(selected);
+}
+
+// ─── Industry tile (grid view) ────────────────────────────────────────────────
+
+function IndustryTile({
+  industry,
+  index,
+  selectedCount,
+  onClick,
+}: {
+  industry: Industry;
+  index: number;
+  selectedCount: number;
+  onClick: () => void;
+}) {
   return (
     <motion.button
       type="button"
       onClick={onClick}
       className={[
-        "relative flex flex-col justify-between rounded-[12px] p-5 text-left transition-colors duration-200 min-h-[110px] w-full",
-        isSelected
-          ? `${industry.selectedBg} ${industry.selectedText}`
-          : "bg-dawn/5 border border-dawn/15 text-dawn hover:bg-dawn/12",
+        "relative flex flex-col justify-end rounded-[14px] p-5 md:p-6 text-left w-full",
+        "min-h-[120px] md:min-h-[140px] overflow-hidden group",
+        industry.cardBg,
+        industry.cardText,
       ].join(" ")}
       initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{
-        delay: index * 0.07,
-        duration: 0.55,
-        ease: easeKulu,
-      }}
-      whileTap={{ scale: 0.96 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, transition: { duration: 0.18 } }}
+      transition={{ delay: index * 0.05, duration: 0.4, ease: easeKulu }}
+      whileHover={{ y: -5, transition: { duration: 0.35, ease: easeKulu } }}
+      whileTap={{ scale: 0.97 }}
     >
-      {/* Check badge */}
-      <AnimatePresence>
-        {isSelected && (
-          <motion.span
-            key="check"
-            className="absolute top-3 right-3 flex items-center justify-center w-6 h-6 rounded-full bg-indigo/15 text-indigo text-xs font-bold"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 420, damping: 22 }}
-          >
-            ✓
-          </motion.span>
-        )}
-      </AnimatePresence>
+      {/* Dot field */}
+      <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.08]" aria-hidden />
 
-      <div>
-        <p className="eyebrow mb-2 opacity-60">{industry.tagline}</p>
+      {/* Hover accent line */}
+      <span
+        className="absolute top-0 left-0 h-[2px] w-0 group-hover:w-full transition-all duration-700 ease-kulu rounded-t-[14px]"
+        style={{ backgroundColor: "currentColor", opacity: 0.25 }}
+        aria-hidden
+      />
+
+      {/* Selection badge */}
+      {selectedCount > 0 && (
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-4 right-4 w-5 h-5 rounded-full bg-stoep text-indigo
+                     text-[10px] font-medium flex items-center justify-center leading-none"
+        >
+          {selectedCount}
+        </motion.span>
+      )}
+
+      <div className="relative">
+        <p className="eyebrow mb-2.5 opacity-50">{industry.tagline}</p>
         <span
-          className="font-display font-medium leading-tight"
-          style={{ fontSize: "clamp(18px, 1.4vw, 24px)" }}
+          className="font-display font-medium leading-tight tracking-[-0.015em]"
+          style={{ fontSize: "clamp(18px, 1.6vw, 26px)" }}
         >
           {industry.name}
+          <span className={industry.periodColor}>.</span>
         </span>
       </div>
     </motion.button>
   );
 }
 
-interface AgendaListProps {
-  items: string[];
-  industryId: string;
-}
+// ─── Selectable seminar pill ───────────────────────────────────────────────────
 
-function AgendaList({ items, industryId }: AgendaListProps) {
+function SelectablePill({
+  seminar,
+  index,
+  selected,
+  onToggle,
+  pillBg,
+  pillText,
+  pillSelectedBg,
+  pillSelectedText,
+}: {
+  seminar: Seminar;
+  index: number;
+  selected: boolean;
+  onToggle: () => void;
+  pillBg: string;
+  pillText: string;
+  pillSelectedBg: string;
+  pillSelectedText: string;
+}) {
   return (
-    <div>
-      <h3
-        className="font-display font-medium text-dawn mb-6"
-        style={{ fontSize: "clamp(18px, 1.3vw, 22px)" }}
+    <motion.button
+      type="button"
+      onClick={onToggle}
+      className={[
+        "rounded-full cursor-pointer select-none text-left",
+        "px-5 py-3 text-[13px] md:text-[14px] font-body font-medium leading-tight",
+        "transition-colors duration-200",
+        "flex items-center gap-2.5",
+        selected
+          ? `${pillSelectedBg} ${pillSelectedText}`
+          : `${pillBg} ${pillText} opacity-70 hover:opacity-100`,
+      ].join(" ")}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.35, ease: easeKulu }}
+      whileHover={{ scale: 1.03, y: -2, transition: { duration: 0.25, ease: easeKulu } }}
+      whileTap={{ scale: 0.97 }}
+    >
+      {/* Checkbox indicator */}
+      <span
+        className={[
+          "flex-shrink-0 w-4 h-4 rounded-full border transition-all duration-200 flex items-center justify-center",
+          selected
+            ? "border-current bg-stoep"
+            : "border-current/30 bg-transparent",
+        ].join(" ")}
       >
-        Your tailored agenda.
-      </h3>
-      <ol className="list-none m-0 p-0">
-        {items.map((item, index) => (
-          <motion.li
-            key={`${industryId}-${index}`}
-            className="flex items-start border-b border-dawn/12 py-4 gap-4 overflow-hidden"
-            initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
-            animate={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}
-            transition={{
-              delay: 0.04 + index * 0.06,
-              duration: 0.65,
-              ease: easeKulu,
-            }}
-          >
-            <span
-              className="eyebrow text-dawn/40 shrink-0 pt-px"
-              style={{ width: "40px" }}
-            >
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span
-              className="font-body text-dawn/85 leading-relaxed"
-              style={{ fontSize: "15px" }}
-            >
-              {item}
-            </span>
-          </motion.li>
-        ))}
-      </ol>
-    </div>
+        {selected && (
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.5 6L8 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </span>
+      {seminar.title}
+    </motion.button>
   );
 }
 
-interface RoomCardProps {
-  room: Room;
-  index: number;
-}
+// ─── Foundation pill (always included, non-interactive) ────────────────────────
 
-function RoomCard({ room, index }: RoomCardProps) {
+function FoundationPill({ seminar, index }: { seminar: Seminar; index: number }) {
   return (
     <motion.div
-      className="bg-dawn/[0.06] rounded-[8px] p-5 border border-dawn/[0.12]"
-      initial={{ opacity: 0, y: 12 }}
+      className="rounded-full cursor-default select-none bg-indigo text-dawn
+                 px-4 py-2.5 text-[12px] md:text-[13px] font-body font-medium leading-tight
+                 flex items-center gap-2"
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        delay: index * 0.08 + 0.3,
-        duration: 0.5,
-        ease: easeKulu,
-      }}
+      exit={{ opacity: 0, transition: { duration: 0.08 } }}
+      transition={{ delay: index * 0.022, duration: 0.35, ease: easeKulu }}
     >
-      <p className="eyebrow text-dawn/50 mb-2">{room.eyebrow}</p>
-      <h4
-        className="font-display font-medium text-dawn mb-2 leading-snug"
-        style={{ fontSize: "18px" }}
-      >
-        {room.title}
-      </h4>
-      <p
-        className="font-body text-dawn/60 leading-relaxed"
-        style={{ fontSize: "13px" }}
-      >
-        {room.body}
-      </p>
+      <span className="flex-shrink-0 w-3.5 h-3.5 rounded-full bg-stoep/60 flex items-center justify-center">
+        <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+          <path d="M1 3L3 5L7 1" stroke="#FFF8E8" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+      {seminar.title}
     </motion.div>
+  );
+}
+
+// ─── Cloud view (selected industry) ──────────────────────────────────────────
+
+function CloudView({
+  industry,
+  selectedSeminars,
+  onToggle,
+  onBack,
+}: {
+  industry: Industry;
+  selectedSeminars: Set<string>;
+  onToggle: (id: string) => void;
+  onBack: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.18 } }}
+      transition={{ duration: 0.28, ease: easeKulu }}
+    >
+      {/* Header row */}
+      <div className="flex items-start gap-4 mb-8 md:mb-10">
+        <motion.button
+          type="button"
+          onClick={onBack}
+          className="flex-shrink-0 mt-1 flex items-center justify-center w-9 h-9 rounded-full
+                     bg-indigo/8 text-indigo hover:bg-indigo/15 transition-colors duration-200"
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.25, ease: easeKulu }}
+          whileTap={{ scale: 0.92 }}
+          aria-label="Back to industries"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 12L6 8l4-4" />
+          </svg>
+        </motion.button>
+
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: easeKulu }}
+        >
+          <p className="eyebrow opacity-45 mb-1.5">Seminar sessions for</p>
+          <h3
+            className="font-display font-semibold leading-tight tracking-[-0.025em]"
+            style={{ fontSize: "clamp(28px, 2.5vw, 42px)" }}
+          >
+            {industry.name}
+            <span className={industry.periodColor}>.</span>
+          </h3>
+          <p className="mt-2 opacity-45 leading-[1.6]" style={{ fontSize: "14px" }}>
+            {industry.tagline}
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Foundation seminars */}
+      <div className="mb-6">
+        <motion.p
+          className="eyebrow opacity-35 mb-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.35 }}
+          transition={{ duration: 0.25 }}
+        >
+          Foundation — always included
+        </motion.p>
+        <div className="flex flex-wrap gap-2.5 md:gap-3">
+          {(industry.customFoundation ?? FOUNDATION_SEMINARS).map((s, i) => (
+            <FoundationPill key={s.id} seminar={s} index={i} />
+          ))}
+        </div>
+      </div>
+
+      {/* Industry-specific seminars */}
+      <div>
+        <motion.p
+          className="eyebrow opacity-35 mb-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.35 }}
+          transition={{ delay: 0.1, duration: 0.25 }}
+        >
+          {industry.name} — select what applies
+        </motion.p>
+        <div className="flex flex-wrap gap-2.5 md:gap-3">
+          {industry.seminars.map((s, i) => (
+            <SelectablePill
+              key={s.id}
+              seminar={s}
+              index={i}
+              selected={selectedSeminars.has(s.id)}
+              onToggle={() => onToggle(s.id)}
+              pillBg={industry.pillBg}
+              pillText={industry.pillText}
+              pillSelectedBg={industry.pillSelectedBg}
+              pillSelectedText={industry.pillSelectedText}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Connecting line accent */}
+      <motion.div
+        className="mt-8 h-[0.5px] bg-indigo/10"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.3, duration: 0.5, ease: easeKulu }}
+        style={{ transformOrigin: "left" }}
+      />
+    </motion.div>
+  );
+}
+
+// ─── Checkout panel ───────────────────────────────────────────────────────────
+
+function CheckoutPanel({ selected }: { selected: Set<string> }) {
+  const count = selected.size;
+  const message = buildMessage(selected);
+  const emailBody = buildEmailBody(selected);
+  const waHref = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
+  const emailHref = `mailto:hello@kulu.co.za?subject=${encodeURIComponent("Seminar booking enquiry")}&body=${encodeURIComponent(emailBody)}`;
+
+  return (
+    <AnimatePresence>
+      {count > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16, transition: { duration: 0.25, ease: easeKulu } }}
+          transition={{ duration: 0.5, ease: easeKulu }}
+          className="mt-10 md:mt-14"
+        >
+          <div className="rounded-[16px] bg-indigo text-dawn p-7 md:p-10 relative overflow-hidden">
+            <div className="absolute inset-0 dot-field pointer-events-none opacity-[0.12]" aria-hidden />
+
+            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-10">
+              <div>
+                <p className="eyebrow text-dawn/40 mb-3">Your programme</p>
+                <h3
+                  className="font-display font-semibold leading-tight tracking-[-0.025em] text-dawn"
+                  style={{ fontSize: "clamp(22px, 2vw, 32px)" }}
+                >
+                  {count} seminar{count !== 1 ? "s" : ""} selected
+                  <span className="text-stoep">.</span>
+                </h3>
+                <p className="mt-2.5 text-[14px] text-dawn/45 leading-[1.65] max-w-[38ch]">
+                  Foundation sessions are always included. Send us your list and we&apos;ll get back to you within a day.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                <motion.a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full
+                             bg-[#25D366] text-white text-[14px] font-medium
+                             hover:brightness-110 transition-all duration-200"
+                  whileHover={{ y: -2, transition: { duration: 0.25, ease: easeKulu } }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {/* WhatsApp icon */}
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                  </svg>
+                  WhatsApp us
+                </motion.a>
+
+                <motion.a
+                  href={emailHref}
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full
+                             bg-dawn/10 text-dawn text-[14px] font-medium border border-dawn/15
+                             hover:bg-dawn/20 transition-all duration-200"
+                  whileHover={{ y: -2, transition: { duration: 0.25, ease: easeKulu } }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  {/* Email icon */}
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m2 7 10 8 10-8" />
+                  </svg>
+                  Send by email
+                </motion.a>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -270,99 +535,61 @@ function RoomCard({ room, index }: RoomCardProps) {
 
 export default function IndustrySelector() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  const headingY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const [selectedSeminars, setSelectedSeminars] = useState<Set<string>>(new Set());
 
   const selectedIndustry = INDUSTRIES.find((i) => i.id === selectedId) ?? null;
 
-  function handleTileClick(id: string) {
-    setSelectedId((prev) => (prev === id ? null : id));
+  function toggleSeminar(id: string) {
+    setSelectedSeminars((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function countForIndustry(industry: Industry): number {
+    return industry.seminars.filter((s) => selectedSeminars.has(s.id)).length;
   }
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative bg-indigo text-dawn overflow-hidden"
-    >
-      {/* Dot field background */}
-      <div className="absolute inset-0 dot-field opacity-30 pointer-events-none" />
-
-      <div className="relative mx-auto max-w-[1480px] px-6 md:px-12 py-24 md:py-32">
-        {/* Heading with parallax */}
-        <motion.div style={{ y: headingY }} className="mb-14">
-          <p className="eyebrow text-dawn/50 mb-4">Tailored content</p>
-          <h2
-            className="font-display font-semibold text-dawn leading-tight"
-            style={{ fontSize: "clamp(32px, 3.5vw, 56px)" }}
-          >
-            What does your firm do?
-          </h2>
-        </motion.div>
-
-        {/* Industry tiles grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-          {INDUSTRIES.map((industry, index) => (
-            <IndustryTile
-              key={industry.id}
-              industry={industry}
-              isSelected={selectedId === industry.id}
-              index={index}
-              onClick={() => handleTileClick(industry.id)}
+    <div className="mt-8 md:mt-12">
+      <AnimatePresence mode="sync">
+        {selectedIndustry ? (
+          <motion.div key={selectedIndustry.id}>
+            <CloudView
+              industry={selectedIndustry}
+              selectedSeminars={selectedSeminars}
+              onToggle={toggleSeminar}
+              onBack={() => setSelectedId(null)}
             />
-          ))}
-        </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="grid"
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+          >
+            {/* Tile grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+              {INDUSTRIES.map((industry, index) => (
+                <IndustryTile
+                  key={industry.id}
+                  industry={industry}
+                  index={index}
+                  selectedCount={countForIndustry(industry)}
+                  onClick={() => setSelectedId(industry.id)}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Content area */}
-        <AnimatePresence mode="wait">
-          {selectedIndustry ? (
-            <motion.div
-              key={selectedIndustry.id}
-              className="mt-12 pt-12 border-t border-dawn/15"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: easeKulu }}
-            >
-              <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
-                {/* Agenda — 60% */}
-                <div className="lg:w-[60%]">
-                  <AgendaList
-                    items={selectedIndustry.agenda}
-                    industryId={selectedIndustry.id}
-                  />
-                </div>
-
-                {/* Rooms — 40% */}
-                <div className="lg:w-[40%]">
-                  <p className="eyebrow text-dawn/50 mb-5">The format</p>
-                  <div className="flex flex-col gap-3">
-                    {ROOMS.map((room, index) => (
-                      <RoomCard key={room.title} room={room} index={index} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="empty"
-              className="mt-10 text-center eyebrow opacity-25"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 0.5, duration: 0.4 }}
-            >
-              select an industry above
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </section>
+      {/* Checkout panel — shown when selections exist */}
+      <CheckoutPanel selected={selectedSeminars} />
+    </div>
   );
 }

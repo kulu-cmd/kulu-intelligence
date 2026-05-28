@@ -7,55 +7,49 @@ import { Magnetic } from "./Magnetic";
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
-type AutomationCategory =
-  | "Documents"
-  | "Communications"
-  | "Sales pipeline"
-  | "Data & admin"
-  | "HR & hiring"
-  | "Knowledge";
+type CreativeCategory =
+  | "Social media"
+  | "Visuals & design"
+  | "Campaigns"
+  | "Brand content"
+  | "Multilingual"
+  | "Conversational";
 
-interface AutomationItem {
+interface CreativeItem {
   id: string;
-  category: AutomationCategory;
+  category: CreativeCategory;
   name: string;
   description: string;
-  timeSaved: string;
+  output: string;
 }
 
-const ALL_ITEMS: AutomationItem[] = [
-  // Documents
-  { id: "d1", category: "Documents", name: "Proposal generator", description: "Sales call notes → complete branded proposal with scope, deliverables, and timeline. Zero manual drafting.", timeSaved: "2–3 hrs / proposal" },
-  { id: "d2", category: "Documents", name: "Contract & SLA builder", description: "Client data → fully populated contract with correct entity names, figures, and dates — gaps highlighted automatically.", timeSaved: "3–5 hrs / contract" },
-  { id: "d3", category: "Documents", name: "Quote & pricing sheet", description: "Line items and margins → formatted, on-brand quote document. Handles currency, escalation, and totals.", timeSaved: "1–2 hrs / quote" },
-  { id: "d4", category: "Documents", name: "Report generator", description: "Raw data → formatted weekly or monthly client-facing report, ready to send.", timeSaved: "2–3 hrs / week" },
-  { id: "d5", category: "Documents", name: "Meeting notes to actions", description: "Rough notes or transcript → structured summary with decisions, owners, and deadlines extracted.", timeSaved: "45 min / meeting" },
-  // Communications
-  { id: "c1", category: "Communications", name: "Email triage & drafter", description: "Incoming emails classified by type → AI drafts responses for routine messages. Human approves and sends.", timeSaved: "1–2 hrs / day" },
-  { id: "c2", category: "Communications", name: "Follow-up sequence builder", description: "Post-meeting or post-proposal → personalised follow-up emails at set intervals. No lead goes cold.", timeSaved: "3–4 hrs / week" },
-  { id: "c3", category: "Communications", name: "Client onboarding pack", description: "New client details → welcome letter, terms summary, account setup, and first-week checklist.", timeSaved: "45 min / client" },
-  { id: "c4", category: "Communications", name: "Review response drafter", description: "New Google or Hellopeter review → personalised on-brand response drafted for approval.", timeSaved: "4–5 hrs / week" },
-  { id: "c5", category: "Communications", name: "Internal newsletter", description: "Weekly inputs from team → formatted internal communication or client newsletter, ready to send.", timeSaved: "2 hrs / week" },
-  // Sales pipeline
-  { id: "s1", category: "Sales pipeline", name: "Lead intake processor", description: "Inbound enquiry → enriched lead profile with pain points, company context, and recommended solution angle.", timeSaved: "30 min / lead" },
-  { id: "s2", category: "Sales pipeline", name: "CRM auto-population", description: "Sales call or email thread → CRM fields updated automatically. No more manual note entry after every call.", timeSaved: "20 min / call" },
-  { id: "s3", category: "Sales pipeline", name: "Competitive intel digest", description: "Competitors monitored weekly → summary of pricing, product, and messaging changes.", timeSaved: "3 hrs / week" },
-  { id: "s4", category: "Sales pipeline", name: "Renewal alert & draft letter", description: "Contract end date approaching → automated alert plus draft renewal letter with pricing pre-filled.", timeSaved: "1 hr / renewal" },
-  // Data & admin
-  { id: "a1", category: "Data & admin", name: "Invoice & PO processor", description: "Incoming invoice or purchase order → data extracted and logged into accounting system automatically.", timeSaved: "1–2 hrs / day" },
-  { id: "a2", category: "Data & admin", name: "KPI dashboard compiler", description: "Multiple data sources → single formatted management report with key metrics, trends, and flags.", timeSaved: "90 min / week" },
-  { id: "a3", category: "Data & admin", name: "Receipt & expense categoriser", description: "Photo of receipt or bank statement → categorised expense entry ready for accountant.", timeSaved: "2–3 hrs / week" },
-  { id: "a4", category: "Data & admin", name: "Document summariser", description: "Long reports, contracts, or RFPs → concise executive summary with key points and required actions.", timeSaved: "1–2 hrs / doc" },
-  // HR & hiring
-  { id: "h1", category: "HR & hiring", name: "CV screener & shortlist", description: "Bulk CV upload → ranked shortlist with match score, red flags, and suggested interview questions.", timeSaved: "1 hr / 10 CVs" },
-  { id: "h2", category: "HR & hiring", name: "Job description writer", description: "Role brief → complete JD with responsibilities, requirements, and tone aligned to company culture.", timeSaved: "1–2 hrs / JD" },
-  { id: "h3", category: "HR & hiring", name: "Employee onboarding pack", description: "New hire details → full onboarding pack: employment summary, IT checklist, policies, first-week schedule.", timeSaved: "2 hrs / hire" },
-  { id: "h4", category: "HR & hiring", name: "Interview summary report", description: "Interview notes or transcript → structured candidate evaluation with strengths, concerns, and hire recommendation.", timeSaved: "30 min / interview" },
-  // Knowledge
-  { id: "k1", category: "Knowledge", name: "Internal Q&A assistant", description: "Your policies and procedures → a smart assistant that answers staff questions instantly, around the clock.", timeSaved: "2–4 hrs / week" },
-  { id: "k2", category: "Knowledge", name: "Client knowledge portal", description: "Your FAQs and product docs → a searchable self-service portal that reduces inbound support queries.", timeSaved: "5–8 hrs / week" },
-  { id: "k3", category: "Knowledge", name: "Training doc generator", description: "Process notes and SOPs → formatted training manuals ready for new hires on day one.", timeSaved: "3–5 hrs / manual" },
-  { id: "k4", category: "Knowledge", name: "Policy digest builder", description: "Dense policy documents → plain-English summaries with searchable key clauses your team can actually use.", timeSaved: "2 hrs / document" },
+const ALL_ITEMS: CreativeItem[] = [
+  // Social media
+  { id: "sm1", category: "Social media", name: "Content calendar builder", description: "Brand brief → a full month of post ideas, captions, and hashtag sets. Consistent voice, zero staring at a blank screen.", output: "30 posts / month" },
+  { id: "sm2", category: "Social media", name: "Caption generator", description: "Product shot or campaign note → platform-ready captions for LinkedIn, Instagram, and Facebook, in your brand voice.", output: "10 captions / hr" },
+  { id: "sm3", category: "Social media", name: "Trend response content", description: "Trending topic detected → brand-relevant post drafted for approval within the hour, not by next week.", output: "Same-day turnaround" },
+  { id: "sm4", category: "Social media", name: "Community reply drafter", description: "Incoming comments and DMs → on-brand responses drafted for review. Engage more, type less.", output: "2 hrs saved / week" },
+  // Visuals & design
+  { id: "v1", category: "Visuals & design", name: "Ad creative generator", description: "Campaign brief → multiple ad variants across sizes and formats, ready for paid social or Google Display.", output: "10 variants / campaign" },
+  { id: "v2", category: "Visuals & design", name: "Product mockup creator", description: "Product photo or description → lifestyle mockups and scene compositions. No photoshoot required.", output: "Same-day delivery" },
+  { id: "v3", category: "Visuals & design", name: "Brand asset kit", description: "Visual brief → on-brand social templates, presentation decks, and marketing collateral in one consistent pack.", output: "Full kit in 48 hrs" },
+  // Campaigns
+  { id: "e1", category: "Campaigns", name: "Email campaign builder", description: "Audience segment and goal → subject line, body, and CTA written and structured, ready to drop into your platform.", output: "1 campaign / hr" },
+  { id: "e2", category: "Campaigns", name: "Personalised sequences", description: "Customer list → multi-step email journeys that adapt to open and click behaviour. No two readers see the same thing.", output: "5-step sequence / day" },
+  { id: "e3", category: "Campaigns", name: "Launch & promo pack", description: "Sale or launch brief → full campaign in one shot: landing page copy, email, social captions, and ad copy.", output: "Full pack in 2 hrs" },
+  // Brand content
+  { id: "b1", category: "Brand content", name: "Blog & article writer", description: "Topic or keyword → well-structured, brand-voice article with headings, subpoints, and a clean close. Ready for a light human edit.", output: "1 article / hr" },
+  { id: "b2", category: "Brand content", name: "Pitch deck creator", description: "Business brief → narrative arc and slide-by-slide content for investor or client pitches. You bring the idea, we shape the story.", output: "10-slide deck / day" },
+  { id: "b3", category: "Brand content", name: "Video script writer", description: "Campaign idea → punchy, scene-by-scene script for reels, ads, or explainer videos. Tone matched to your brand.", output: "Full script in 90 min" },
+  { id: "b4", category: "Brand content", name: "Podcast show notes", description: "Episode recording or transcript → formatted show notes, timestamps, chapter titles, and social pull quotes.", output: "30 min / episode" },
+  // Multilingual
+  { id: "ml1", category: "Multilingual", name: "SA language content", description: "English copy → content translated into Afrikaans, Zulu, or Xhosa that sounds natural, not like a machine did it.", output: "4 languages / piece" },
+  { id: "ml2", category: "Multilingual", name: "Localised campaign copy", description: "National campaign → adapted messaging for each market. The same offer, written for the people you're actually talking to.", output: "Per market, same day" },
+  { id: "ml3", category: "Multilingual", name: "WhatsApp broadcasts", description: "Campaign brief → short, conversational messages in the language your customers use. High open rates start with the right words.", output: "10 messages / hr" },
+  // Conversational
+  { id: "ch1", category: "Conversational", name: "WhatsApp assistant", description: "Your FAQs, offers, and service info → a trained assistant that chats with customers in their language, around the clock.", output: "24/7 availability" },
+  { id: "ch2", category: "Conversational", name: "Website chat widget", description: "Product or service docs → a branded chat widget that qualifies leads and answers questions the moment they land.", output: "Live in 5 days" },
+  { id: "ch3", category: "Conversational", name: "Social auto-replies", description: "Common DM questions on Instagram and Facebook → instant, personalised responses that keep the conversation warm.", output: "Zero response delay" },
 ];
 
 // ─── Topic tiles ───────────────────────────────────────────────────────────
@@ -64,18 +58,18 @@ interface Topic {
   id: string;
   label: string;
   descriptor: string;
-  category: AutomationCategory;
-  selectedBg: string;    // bg-* token
-  selectedText: string;  // text-* token
+  category: CreativeCategory;
+  selectedBg: string;
+  selectedText: string;
 }
 
 const TOPICS: Topic[] = [
-  { id: "docs",  label: "Admin & Paperwork",   descriptor: "Proposals · Contracts · Quotes",   category: "Documents",      selectedBg: "bg-mielie",  selectedText: "text-indigo" },
-  { id: "comms", label: "Communications",       descriptor: "Emails · Follow-ups · Onboarding", category: "Communications", selectedBg: "bg-spruit",  selectedText: "text-indigo" },
-  { id: "data",  label: "Reports & Data",       descriptor: "KPIs · Expenses · Dashboards",     category: "Data & admin",   selectedBg: "bg-indigo",  selectedText: "text-dawn"   },
-  { id: "sales", label: "Sales Pipeline",       descriptor: "Leads · CRM · Renewals",           category: "Sales pipeline", selectedBg: "bg-stoep",   selectedText: "text-indigo" },
-  { id: "hr",    label: "Hiring & HR",          descriptor: "CVs · Job ads · Onboarding",       category: "HR & hiring",    selectedBg: "bg-mielie",  selectedText: "text-indigo" },
-  { id: "kb",    label: "Knowledge Bases",      descriptor: "Q&A bots · Training · Portals",    category: "Knowledge",      selectedBg: "bg-spruit",  selectedText: "text-indigo" },
+  { id: "social",  label: "Social Media",       descriptor: "Posts · Captions · Calendar",     category: "Social media",      selectedBg: "bg-stoep",  selectedText: "text-indigo" },
+  { id: "visuals", label: "Visuals & Design",    descriptor: "Ads · Mockups · Templates",       category: "Visuals & design",  selectedBg: "bg-mielie", selectedText: "text-indigo" },
+  { id: "camps",   label: "Campaigns",           descriptor: "Email · Sequences · Promos",      category: "Campaigns",         selectedBg: "bg-spruit", selectedText: "text-indigo" },
+  { id: "brand",   label: "Brand Content",       descriptor: "Blogs · Decks · Scripts",         category: "Brand content",     selectedBg: "bg-indigo", selectedText: "text-dawn"   },
+  { id: "lang",    label: "Multilingual",        descriptor: "Zulu · Afrikaans · Xhosa",        category: "Multilingual",      selectedBg: "bg-mielie", selectedText: "text-indigo" },
+  { id: "chat",    label: "Conversational",      descriptor: "Chatbots · WhatsApp · Portals",   category: "Conversational",    selectedBg: "bg-spruit", selectedText: "text-indigo" },
 ];
 
 // ─── Topic tile ────────────────────────────────────────────────────────────
@@ -148,21 +142,21 @@ function TopicTile({
 
 const WA_NUMBER = "27613889339";
 
-function buildAutomationWaUrl(item: AutomationItem): string {
+function buildCreativeWaUrl(item: CreativeItem): string {
   const message = [
     `Hi Kulu 👋`,
     ``,
-    `I'm interested in building the *${item.name}* automation for my business.`,
+    `I'm interested in creating *${item.name}* for my business.`,
     ``,
     `${item.description}`,
     ``,
-    `Can we chat about getting this set up?`,
+    `Can we chat about making this happen?`,
   ].join("\n");
   return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-function ResultCard({ item, index }: { item: AutomationItem; index: number }) {
-  const waUrl = buildAutomationWaUrl(item);
+function ResultCard({ item, index }: { item: CreativeItem; index: number }) {
+  const waUrl = buildCreativeWaUrl(item);
   return (
     <motion.article
       layout
@@ -181,12 +175,12 @@ function ResultCard({ item, index }: { item: AutomationItem; index: number }) {
         aria-hidden
       />
 
-      {/* Category + time saved */}
+      {/* Category + output */}
       <div className="flex items-center justify-between gap-4 mb-5">
         <span className="eyebrow opacity-38">{item.category}</span>
         <div className="flex items-center gap-1.5 flex-shrink-0">
           <span className="block w-1.5 h-1.5 rounded-full bg-stoep opacity-60 flex-shrink-0" aria-hidden />
-          <span className="eyebrow opacity-40">{item.timeSaved} saved</span>
+          <span className="eyebrow opacity-40">{item.output}</span>
         </div>
       </div>
 
@@ -210,7 +204,7 @@ function ResultCard({ item, index }: { item: AutomationItem; index: number }) {
           className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stoep
                      hover:gap-3 transition-all duration-200"
         >
-          Build this for me →
+          Create this with me →
         </a>
       </div>
     </motion.article>
@@ -219,7 +213,7 @@ function ResultCard({ item, index }: { item: AutomationItem; index: number }) {
 
 // ─── Main component ────────────────────────────────────────────────────────
 
-export function AutomationCatalogue({ showHeading = true }: { showHeading?: boolean }) {
+export function CreativeCatalogue({ showHeading = true }: { showHeading?: boolean }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function toggle(id: string) {
@@ -240,18 +234,18 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
   const noneSelected = selected.size === 0;
 
   return (
-    <section className={`${showHeading ? "pt-28 md:pt-36" : "pt-16 md:pt-20"} pb-24 md:pb-32 bg-dawn overflow-hidden`}>
+    <section className={`${showHeading ? "py-24 md:py-32" : "pt-16 md:pt-20 pb-24 md:pb-32"} bg-dawn overflow-hidden border-t border-indigo/10`}>
       <div className="mx-auto max-w-[1480px] px-6 md:px-12">
 
         {/* ── Heading ─────────────────────────────────────── */}
         <div className="mb-12 md:mb-16">
           {showHeading && (
             <h2
-              aria-label="Automate something."
+              aria-label="Create something."
               className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
                          text-[44px] sm:text-[64px] md:text-[80px] lg:text-[96px]"
             >
-              {["Automate", "something"].map((word, i) => (
+              {["Create", "something"].map((word, i) => (
                 <span key={word} className="inline-block overflow-hidden mr-[0.22em] pb-[0.18em] mb-[-0.18em]">
                   <motion.span
                     className="inline-block"
@@ -291,9 +285,9 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
               <p
                 className="font-display font-medium tracking-[-0.025em] text-indigo text-center text-[18px] sm:text-[20px] md:text-[24px]"
               >
-                Point at the{" "}
+                Pick your{" "}
                 <span className="relative inline-block">
-                  <span className="relative z-10 text-stoep">culprit</span>
+                  <span className="relative z-10 text-stoep">canvas</span>
                   <motion.span
                     className="absolute left-0 bottom-[2px] h-[2px] bg-stoep rounded-full"
                     initial={{ width: 0 }}
@@ -345,7 +339,7 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
               className="mt-16 flex items-center justify-center gap-3"
             >
               <div className="h-px flex-1 bg-indigo/8" />
-              <span className="eyebrow opacity-25">select a category above to see what's possible</span>
+              <span className="eyebrow opacity-25">select a format above to see what's possible</span>
               <div className="h-px flex-1 bg-indigo/8" />
             </motion.div>
           )}
@@ -372,7 +366,7 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className="font-display font-semibold text-[20px] md:text-[28px] lg:text-[34px] tracking-[-0.025em] leading-[1]"
                   >
-                    {filteredItems.length} automation{filteredItems.length !== 1 ? "s" : ""} we can build for you
+                    {filteredItems.length} creative offering{filteredItems.length !== 1 ? "s" : ""} we can build for you
                     <span className="text-stoep">.</span>
                   </motion.div>
                 </AnimatePresence>
@@ -399,8 +393,8 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
                            flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
               >
                 <p className="text-[14px] md:text-[15px] opacity-55 max-w-[44ch] leading-[1.65]">
-                  Not seeing exactly what you need? We build bespoke.
-                  Tell us the problem — we'll figure out the solution.
+                  Not seeing what you had in mind? We create bespoke.
+                  Tell us the idea — we'll figure out the format.
                 </p>
                 <Magnetic strength={0.3}>
                   <motion.div whileTap={{ scale: 0.96 }}>
@@ -410,7 +404,7 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
                                  bg-stoep text-indigo rounded-full text-[14px] font-medium
                                  hover:bg-[#ff5747] transition-colors duration-300"
                     >
-                      Talk to us →
+                      Let's make something →
                     </Link>
                   </motion.div>
                 </Magnetic>
