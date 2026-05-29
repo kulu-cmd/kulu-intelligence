@@ -25,8 +25,9 @@ const READING_DONE = S3_START + (S3_WORDS.length - 1) * PACE + 0.55;
 const ATTR_DELAY   = READING_DONE + 0.28;
 const SCROLL_DELAY = ATTR_DELAY   + 0.50;
 
-// 2.7 s of rest after the last word settles → auto-scroll to next section
-const AUTO_SCROLL_DELAY_MS = Math.round((READING_DONE + 2.7) * 1000) - 1000;
+// Auto-scroll fires once the full reading animation is done:
+// scroll indicator appears at SCROLL_DELAY, give it 1.2s to register, then go.
+const AUTO_SCROLL_DELAY_MS = Math.round((SCROLL_DELAY + 1.2) * 1000);
 
 // ─── Word component ─────────────────────────────────────────────────────────
 // Scale punch: 0.78 → 1.13 → 0.96 → 1.0 (overshoot = the recognition jolt)
