@@ -5,6 +5,7 @@ import { CustomCursor } from "@/components/CustomCursor";
 import { PageEnter } from "@/components/PageEnter";
 import { AboutHero } from "@/components/AboutHero";
 import { AboutDiscovery } from "@/components/AboutDiscovery";
+import { AboutStoryNav } from "@/components/AboutStoryNav";
 import { ContactButtons } from "@/components/ContactButtons";
 
 export default function AboutPage() {
@@ -14,22 +15,23 @@ export default function AboutPage() {
       <PageEnter />
       <SiteHeader />
 
+      <AboutStoryNav />
+
       <main>
 
-        {/* Pop-art animated Bane speech hero */}
+        {/* Frame 1: Born in South Africa */}
         <AboutHero />
 
-        {/* Origin · Method · Wave sections */}
+        {/* Frames 2–7: The Long Walk Home */}
         <AboutDiscovery />
 
         {/* Contact */}
         <section
           id="contact"
-          className="relative overflow-hidden bg-indigo text-dawn scroll-mt-24"
+          className="relative overflow-hidden bg-dawn text-indigo scroll-mt-24"
         >
-          <div className="absolute inset-0 dot-field opacity-50 pointer-events-none" aria-hidden />
           <div
-            className="relative mx-auto max-w-[1480px] px-6 md:px-12 py-12 md:py-16
+            className="relative mx-auto max-w-[1480px] px-6 md:px-12 py-14 md:py-20
                         grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center"
           >
             <Reveal className="md:col-span-6">
@@ -40,7 +42,7 @@ export default function AboutPage() {
                 Drop us a line<span className="text-stoep">.</span>
               </h2>
               <p className="mt-6 text-[15px] md:text-[16px] leading-[1.7] opacity-55 max-w-[40ch]">
-                Tell us what's on your desk. We'll come back the same day.
+                Tell us what&apos;s on your desk. We&apos;ll come back the same day.
               </p>
             </Reveal>
 

@@ -278,6 +278,20 @@ export function AutomationCatalogue({ showHeading = true }: { showHeading?: bool
               </span>
             </h2>
           )}
+
+          {/* Quirky nudge */}
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, delay: 0.34, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-6 text-center font-body text-body text-indigo/50 italic"
+          >
+            P.S. If you don&apos;t know where to start — we recommend Sales Pipelines or Knowledge Bases!
+            <br />
+            <span className="ml-6">Help your Sales Team uncover new leads, or build knowledge banks around your existing data.</span>
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}

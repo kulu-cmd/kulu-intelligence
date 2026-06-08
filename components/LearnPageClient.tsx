@@ -53,7 +53,7 @@ const FORMAT_STATS = [
   { label: "Group size", value: "Up to 40" },
 ];
 
-const TITLE_WORDS = ["Rough", "and", "Tumble", "with", "AI"];
+const TITLE_WORDS = ["The", "Fast", "Track"];
 
 // ─── Audience card ────────────────────────────────────────────────────────────
 
@@ -127,7 +127,7 @@ export default function LearnPageClient() {
 
         <div className="relative mx-auto max-w-[1480px] px-6 md:px-12">
           <motion.h1
-            aria-label="Rough and Tumble with AI"
+            aria-label="The Fast Track"
             style={{ y: titleY, willChange: "transform" }}
             className="font-display font-semibold leading-[0.92] tracking-[-0.04em]
                        text-[44px] sm:text-[64px] md:text-[96px] lg:text-[120px] max-w-[16ch]"
@@ -163,6 +163,17 @@ export default function LearnPageClient() {
               </span>
             ))}
           </motion.h1>
+
+          {/* Descriptor blurb */}
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, delay: 0.34, ease: easeKulu }}
+            className="mt-6 text-body text-indigo/50 italic max-w-[52ch]"
+          >
+            2 highly focused sessions targeted at bringing your staff up to speed with the latest best practices and techniques with AI. From prompt enhancement to working with documents, we&apos;ve got you covered.
+          </motion.p>
 
           <IndustrySelector />
         </div>
@@ -208,16 +219,6 @@ export default function LearnPageClient() {
             >
               Who is it for<span className="text-stoep">?</span>
             </h2>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.7, delay: 0.18, ease: easeKulu }}
-              className="mt-5 text-[15px] leading-[1.65] text-dawn/50 max-w-[46ch]"
-            >
-              The session adapts to the room. Same material, different angle — depending
-              on who is in the seats and what they are responsible for.
-            </motion.p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
