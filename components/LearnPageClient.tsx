@@ -172,7 +172,7 @@ export default function LearnPageClient() {
             transition={{ duration: 0.7, delay: 0.34, ease: easeKulu }}
             className="mt-6 text-body text-indigo/50 italic max-w-[52ch]"
           >
-            2 highly focused sessions targeted at bringing your staff up to speed with the latest best practices and techniques with AI. From prompt enhancement to working with documents, we&apos;ve got you covered.
+            2 highly focused sessions targeted at bringing your staff up to speed with the latest best practices and techniques with AI.<br />From prompt enhancement to working with documents, we&apos;ve got you covered.
           </motion.p>
 
           <IndustrySelector />
